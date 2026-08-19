@@ -1,0 +1,912 @@
+import pygame
+import random
+import math
+
+# Инициализация
+pygame.init()
+WIDTH, HEIGHT = 1200, 700
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("🔪 УБИЙЦА И ПОБЕГ 🔪")
+clock = pygame.time.Clock()
+font = pygame.font.Font(None, 36)
+big_font = pygame.font.Font(None, 72)
+small_font = pygame.font.Font(None, 24)
+
+# Цвета
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+DARK_RED = (150, 0, 0)
+GREEN = (0, 255, 0)
+DARK_GREEN = (0, 150, 0)
+BLUE = (0, 0, 255)
+LIGHT_BLUE = (100, 150, 255)
+YELLOW = (255, 255, 0)
+ORANGE = (255, 165, 0)
+PURPLE = (128, 0, 128)
+GRAY = (128, 128, 128)
+DARK_GRAY = (40, 40, 40)
+BROWN = (139, 69, 19)
+SKIN = (255, 200, 150)
+LIGHT_GRAY = (200, 200, 200)
+DARK_BROWN = (101, 67, 33)
+LIGHT_GREEN = (144, 238, 144)
+
+# Настройки игры
+PLAYER_SPEED = 4
+KILLER_SPEED = 2.5
+ITEM_SPAWN_TIME = 5000
+GAME_DURATION = 120
+
+# Класс игрока (жертва)
+class Player:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = 30
+        self.height = 45
+        self.speed = PLAYER_SPEED
+        self.direction = "down"
+        self.alive = True
+        self.trail = []
+        self.trail_timer = 0
+        self.sprint_timer = 0
+        self.is_sprinting = False
+        self.stamina = 100
+        self.max_stamina = 100
+        self.health = 100
+        self.max_health = 100
+        
+        # Новые механики
+        self.is_hiding = False
+        self.hide_timer = 0
+        self.is_screaming = False
+        self.scream_timer = 0
+        self.scream_cooldown = 0
+        self.noise_level = 0
+        self.hiding_spot = None
+        
+    def update(self, obstacles, items, hiding_spots):
+        if not self.alive:
+            return
+            
+        keys = pygame.key.get_pressed()
+        dx, dy = 0, 0
+        
+        # Движение (только если не прячемся)
+        if not self.is_hiding:
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                dx = -self.speed
+                self.direction = "left"
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                dx = self.speed
+                self.direction = "right"
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                dy = -self.speed
+                self.direction = "up"
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                dy = self.speed
+                self.direction = "down"
+                
+            # Спринт
+            self.is_sprinting = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
+            if self.is_sprinting and self.stamina > 0:
+                dx *= 1.7
+                dy *= 1.7
+                self.stamina -= 0.8
+                self.noise_level += 0.5
+            else:
+                if self.stamina < self.max_stamina:
+                    self.stamina += 0.3
+                    
+            # Движение по диагонали (нормализация)
+            if dx != 0 and dy != 0:
+                dx *= 0.707
+                dy *= 0.707
+                
+            self.x += dx
+            self.y += dy
+            
+            # Шум от ходьбы
+            if abs(dx) > 0 or abs(dy) > 0:
+                self.noise_level += 0.1
+            else:
+                self.noise_level *= 0.95
+                
+        # Границы
+        self.x = max(0, min(self.x, WIDTH - self.width))
+        self.y = max(0, min(self.y, HEIGHT - self.height))
+        
+        # Столкновения с препятствиями
+        for obstacle in obstacles:
+            if (self.x < obstacle.x + obstacle.width and 
+                self.x + self.width > obstacle.x and
+                self.y < obstacle.y + obstacle.height and
+                self.y + self.height > obstacle.y):
+                if not self.is_hiding:
+                    self.x -= dx * 1.5
+                    self.y -= dy * 1.5
+                    
+        # Прятки
+        self.is_hiding = False
+        self.hiding_spot = None
+        if keys[pygame.K_SPACE]:
+            for spot in hiding_spots:
+                if (self.x + self.width // 2 > spot.x and 
+                    self.x + self.width // 2 < spot.x + spot.width and
+                    self.y + self.height > spot.y and
+                    self.y < spot.y + spot.height):
+                    self.is_hiding = True
+                    self.hiding_spot = spot
+                    self.noise_level = 0
+                    break
+                    
+        # Крик
+        if self.scream_cooldown > 0:
+            self.scream_cooldown -= 1
+            
+        if keys[pygame.K_e] and self.scream_cooldown == 0 and not self.is_hiding:
+            self.is_screaming = True
+            self.scream_timer = 30
+            self.scream_cooldown = 180
+            self.noise_level = 100  # Максимальный шум
+            
+        if self.is_screaming:
+            self.scream_timer -= 1
+            if self.scream_timer <= 0:
+                self.is_screaming = False
+                
+        # Сбор предметов
+        for item in items[:]:
+            if item.alive and item.rect.colliderect(self.rect()):
+                if item.type == "health":
+                    item.apply(self)
+                elif item.type == "speed":
+                    item.apply(self)
+                elif item.type == "stamina":
+                    item.apply(self)
+                items.remove(item)
+                
+        # След
+        if not self.is_hiding:
+            self.trail_timer += 1
+            if self.trail_timer > 3:
+                self.trail_timer = 0
+                self.trail.append((int(self.x + self.width/2), int(self.y + self.height/2)))
+                if len(self.trail) > 50:
+                    self.trail.pop(0)
+        else:
+            # В прятках след исчезает
+            if self.trail:
+                self.trail.pop(0)
+                
+    def rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    def draw(self, screen):
+        if not self.alive:
+            return
+            
+        x, y = self.x, self.y
+        
+        # След (только если не в прятках)
+        if not self.is_hiding:
+            for i, (tx, ty) in enumerate(self.trail):
+                alpha = int(255 * (i / len(self.trail)))
+                pygame.draw.circle(screen, (100, 100, 255, alpha), (tx, ty), 3)
+                
+        # Если в прятках - полупрозрачный
+        if self.is_hiding:
+            s = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+            s.fill((255, 255, 255, 50))
+            screen.blit(s, (x, y))
+            
+        # Тело
+        body_rect = pygame.Rect(x + 5, y + 12, 20, 25)
+        body_color = (50, 200, 50) if self.is_hiding else (50, 50, 200)
+        pygame.draw.rect(screen, body_color, body_rect)
+        pygame.draw.rect(screen, (30, 30, 150), body_rect, 2)
+        
+        # Голова
+        head_x = x + self.width // 2
+        head_y = y + 10
+        pygame.draw.circle(screen, SKIN, (head_x, head_y), 10)
+        pygame.draw.circle(screen, (200, 150, 100), (head_x, head_y), 10, 2)
+        
+        # Глаза (испуганные)
+        if self.direction == "right":
+            eye_offset = 4
+        elif self.direction == "left":
+            eye_offset = -4
+        else:
+            eye_offset = 0
+            
+        # Испуганные глаза
+        pygame.draw.circle(screen, WHITE, (head_x - 4 + eye_offset, head_y - 2), 5)
+        pygame.draw.circle(screen, WHITE, (head_x + 4 + eye_offset, head_y - 2), 5)
+        pygame.draw.circle(screen, BLACK, (head_x - 2 + eye_offset, head_y - 1), 3)
+        pygame.draw.circle(screen, BLACK, (head_x + 6 + eye_offset, head_y - 1), 3)
+        
+        # Брови (испуганные)
+        pygame.draw.line(screen, BLACK, (head_x - 8 + eye_offset, head_y - 8), 
+                        (head_x - 2 + eye_offset, head_y - 6), 2)
+        pygame.draw.line(screen, BLACK, (head_x + 8 + eye_offset, head_y - 8), 
+                        (head_x + 2 + eye_offset, head_y - 6), 2)
+        
+        # Рот (крик)
+        if self.is_screaming:
+            pygame.draw.ellipse(screen, RED, (head_x - 6, head_y + 4, 12, 8))
+            pygame.draw.ellipse(screen, (100, 0, 0), (head_x - 5, head_y + 5, 10, 6))
+        else:
+            pygame.draw.arc(screen, RED, (head_x - 5, head_y + 3, 10, 6), 0, 3.14, 2)
+        
+        # Волосы
+        pygame.draw.arc(screen, (100, 50, 20), (x + 5, y - 2, 20, 15), 3.14, 6.28, 3)
+        
+        # Ноги
+        leg_offset = 5 if self.is_sprinting else 0
+        pygame.draw.rect(screen, (30, 30, 100), (x + 7, y + 37, 6, 10))
+        pygame.draw.rect(screen, (30, 30, 100), (x + 17, y + 37, 6, 10))
+        
+        # Рюкзак
+        pygame.draw.rect(screen, (150, 100, 50), (x + 22, y + 14, 8, 15))
+        
+        # Индикатор выносливости
+        stamina_width = int((self.stamina / self.max_stamina) * 40)
+        pygame.draw.rect(screen, GRAY, (x, y - 10, 40, 4))
+        color = GREEN if self.stamina > 50 else YELLOW if self.stamina > 25 else RED
+        pygame.draw.rect(screen, color, (x, y - 10, stamina_width, 4))
+        
+        # Статус
+        if self.is_hiding:
+            hide_text = small_font.render("🙈 В ПРЯТКАХ", True, LIGHT_GREEN)
+            screen.blit(hide_text, (x - 15, y - 30))
+        if self.is_screaming:
+            scream_text = big_font.render("🔊 ААААА!", True, RED)
+            screen.blit(scream_text, (x - 40, y - 80))
+            
+        # Индикатор шума
+        if self.noise_level > 10:
+            noise_width = int((self.noise_level / 100) * 40)
+            pygame.draw.rect(screen, GRAY, (x, y - 16, 40, 4))
+            color = YELLOW if self.noise_level < 50 else ORANGE if self.noise_level < 75 else RED
+            pygame.draw.rect(screen, color, (x, y - 16, noise_width, 4))
+
+# Класс убийцы
+class Killer:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = 35
+        self.height = 50
+        self.speed = KILLER_SPEED
+        self.direction = "down"
+        self.alive = True
+        self.state = "searching"  # chasing, searching, attacking
+        self.search_timer = 0
+        self.attack_cooldown = 0
+        self.attack_timer = 0
+        self.is_attacking = False
+        self.last_known_x = x
+        self.last_known_y = y
+        self.investigate_timer = 0
+        self.noise_heard = False
+        
+    def update(self, player, obstacles):
+        if not self.alive or not player.alive:
+            return
+            
+        dx, dy = 0, 0
+        distance_to_player = math.hypot(self.x - player.x, self.y - player.y)
+        
+        # Слышим ли шум?
+        if player.noise_level > 50 and distance_to_player < 400:
+            self.noise_heard = True
+            self.last_known_x = player.x
+            self.last_known_y = player.y
+            self.investigate_timer = 60
+            
+        # Атака
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= 1
+            
+        if self.attack_timer > 0:
+            self.attack_timer -= 1
+            if self.attack_timer == 0:
+                self.is_attacking = False
+                
+        if distance_to_player < 50 and self.attack_cooldown == 0 and not player.is_hiding:
+            self.is_attacking = True
+            self.attack_timer = 20
+            self.attack_cooldown = 60
+            player.alive = False
+            return
+            
+        # Преследование
+        if self.state == "chasing":
+            if player.is_hiding and distance_to_player > 100:
+                self.state = "searching"
+                self.search_timer = 0
+            elif distance_to_player < 50:
+                self.state = "attacking"
+            else:
+                # Движение к игроку
+                if abs(player.x - self.x) > 5:
+                    dx = self.speed if player.x > self.x else -self.speed
+                if abs(player.y - self.y) > 5:
+                    dy = self.speed if player.y > self.y else -self.speed
+                    
+                # Проверка препятствий
+                new_x = self.x + dx
+                new_y = self.y + dy
+                blocked = False
+                for obstacle in obstacles:
+                    if (new_x < obstacle.x + obstacle.width and 
+                        new_x + self.width > obstacle.x and
+                        self.y < obstacle.y + obstacle.height and
+                        self.y + self.height > obstacle.y):
+                        blocked = True
+                        break
+                if not blocked:
+                    self.x = new_x
+                    
+                blocked = False
+                for obstacle in obstacles:
+                    if (self.x < obstacle.x + obstacle.width and 
+                        self.x + self.width > obstacle.x and
+                        new_y < obstacle.y + obstacle.height and
+                        new_y + self.height > obstacle.y):
+                        blocked = True
+                        break
+                if not blocked:
+                    self.y = new_y
+                    
+        elif self.state == "searching":
+            self.search_timer += 1
+            
+            # Проверяем шум
+            if self.noise_heard:
+                self.investigate_timer -= 1
+                # Идем к источнику шума
+                if abs(self.last_known_x - self.x) > 5:
+                    dx = self.speed * 0.7 if self.last_known_x > self.x else -self.speed * 0.7
+                if abs(self.last_known_y - self.y) > 5:
+                    dy = self.speed * 0.7 if self.last_known_y > self.y else -self.speed * 0.7
+                self.x += dx
+                self.y += dy
+                if self.investigate_timer <= 0:
+                    self.noise_heard = False
+            else:
+                # Случайное блуждание
+                if random.random() < 0.02:
+                    self.speed = random.choice([-1, 1]) * KILLER_SPEED * 0.5
+                self.x += self.speed * 0.5
+                
+            # Если нашли игрока
+            if distance_to_player < 200 and not player.is_hiding:
+                self.state = "chasing"
+                
+            if self.search_timer > 180:
+                self.state = "chasing"
+                
+        # Определение направления
+        if abs(dx) > abs(dy):
+            self.direction = "right" if dx > 0 else "left"
+        else:
+            self.direction = "down" if dy > 0 else "up"
+            
+        # Границы
+        self.x = max(0, min(self.x, WIDTH - self.width))
+        self.y = max(0, min(self.y, HEIGHT - self.height))
+        
+    def rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    def draw(self, screen):
+        if not self.alive:
+            return
+            
+        x, y = self.x, self.y
+        
+        # Тень
+        pygame.draw.ellipse(screen, (0, 0, 0, 50), (x, y + 50, 35, 8))
+        
+        # Тело (плащ)
+        body_rect = pygame.Rect(x + 5, y + 15, 25, 30)
+        pygame.draw.rect(screen, (30, 30, 30), body_rect)
+        pygame.draw.rect(screen, (50, 50, 50), body_rect, 2)
+        
+        # Рваный плащ снизу
+        pygame.draw.polygon(screen, (40, 40, 40), [
+            (x + 2, y + 40),
+            (x + 8, y + 50),
+            (x + 12, y + 42),
+            (x + 18, y + 52),
+            (x + 24, y + 40),
+            (x + 30, y + 48),
+            (x + 33, y + 40)
+        ])
+        
+        # Голова
+        head_x = x + self.width // 2
+        head_y = y + 12
+        
+        # Капюшон
+        pygame.draw.polygon(screen, (20, 20, 20), [
+            (x + 5, y + 5),
+            (x + 15, y - 5),
+            (x + 25, y + 5),
+            (x + 30, y + 15),
+            (x + 5, y + 15)
+        ])
+        pygame.draw.polygon(screen, (30, 30, 30), [
+            (x + 8, y + 8),
+            (x + 17, y + 2),
+            (x + 26, y + 8),
+            (x + 28, y + 15),
+            (x + 8, y + 15)
+        ], 2)
+        
+        # Красные глаза (свечение)
+        eye_y = y + 10
+        if self.state == "chasing" or self.is_attacking:
+            glow_size = 8 if self.is_attacking else 5
+            pygame.draw.circle(screen, RED, (x + 10, eye_y), glow_size)
+            pygame.draw.circle(screen, RED, (x + 25, eye_y), glow_size)
+            pygame.draw.circle(screen, (255, 100, 100), (x + 10, eye_y), glow_size - 2)
+            pygame.draw.circle(screen, (255, 100, 100), (x + 25, eye_y), glow_size - 2)
+            # Свечение
+            glow_surf = pygame.Surface((50, 30), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, (255, 0, 0, 50), (15, 10), 20)
+            screen.blit(glow_surf, (x, y + 2))
+        else:
+            pygame.draw.circle(screen, (100, 0, 0), (x + 10, eye_y), 3)
+            pygame.draw.circle(screen, (100, 0, 0), (x + 25, eye_y), 3)
+            
+        # Руки
+        if self.is_attacking:
+            # Рука с ножом (атака)
+            pygame.draw.line(screen, (50, 50, 50), (x + 30, y + 20), (x + 55, y + 10), 5)
+            pygame.draw.polygon(screen, (200, 200, 200), [
+                (x + 52, y + 5),
+                (x + 60, y + 8),
+                (x + 55, y + 15),
+                (x + 50, y + 12)
+            ])
+            # Брызги крови
+            for _ in range(5):
+                sx = x + 55 + random.randint(-20, 20)
+                sy = y + 10 + random.randint(-20, 20)
+                pygame.draw.circle(screen, RED, (sx, sy), random.randint(2, 6))
+        else:
+            # Обычные руки
+            pygame.draw.line(screen, (50, 50, 50), (x + 2, y + 20), (x - 5, y + 35), 4)
+            pygame.draw.line(screen, (50, 50, 50), (x + 33, y + 20), (x + 40, y + 35), 4)
+            
+            # Нож в руке
+            pygame.draw.line(screen, (200, 200, 200), (x + 38, y + 25), (x + 50, y + 15), 3)
+            pygame.draw.line(screen, (150, 100, 50), (x + 35, y + 28), (x + 38, y + 25), 4)
+            
+        # Индикатор состояния
+        state_colors = {"chasing": RED, "searching": YELLOW, "attacking": ORANGE}
+        state_text = small_font.render(self.state, True, state_colors.get(self.state, WHITE))
+        screen.blit(state_text, (x, y - 25))
+        
+        # Красное свечение вокруг убийцы
+        glow_surf = pygame.Surface((60, 60), pygame.SRCALPHA)
+        pygame.draw.circle(glow_surf, (255, 0, 0, 20), (30, 30), 40)
+        screen.blit(glow_surf, (x - 12, y - 12))
+
+# Класс предметов
+class Item:
+    def __init__(self, x, y, item_type):
+        self.x = x
+        self.y = y
+        self.type = item_type
+        self.width = 20
+        self.height = 20
+        self.alive = True
+        self.rect = pygame.Rect(x, y, 20, 20)
+        self.spawn_time = pygame.time.get_ticks()
+        self.lifetime = 8000
+        
+        if item_type == "health":
+            self.color = (0, 255, 0)
+            self.emoji = "❤️"
+            self.value = 30
+        elif item_type == "speed":
+            self.color = (0, 200, 255)
+            self.emoji = "⚡"
+            self.value = 50
+        elif item_type == "stamina":
+            self.color = (255, 200, 0)
+            self.emoji = "💪"
+            self.value = 50
+            
+    def update(self):
+        if pygame.time.get_ticks() - self.spawn_time > self.lifetime:
+            self.alive = False
+            
+    def apply(self, player):
+        if self.type == "health":
+            player.health = min(100, player.health + self.value)
+        elif self.type == "speed":
+            player.speed = PLAYER_SPEED * 1.5
+            pygame.time.set_timer(pygame.USEREVENT + 1, 3000)
+        elif self.type == "stamina":
+            player.stamina = min(player.max_stamina, player.stamina + self.value)
+            
+    def draw(self, screen):
+        if not self.alive:
+            return
+            
+        # Свечение
+        glow_surf = pygame.Surface((40, 40), pygame.SRCALPHA)
+        glow_color = (*self.color, 50)
+        pygame.draw.circle(glow_surf, glow_color, (20, 20), 25)
+        screen.blit(glow_surf, (self.x - 10, self.y - 10))
+        
+        # Сам предмет
+        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+        
+        # Эмодзи
+        font_big = pygame.font.Font(None, 24)
+        emoji_text = font_big.render(self.emoji, True, WHITE)
+        screen.blit(emoji_text, (self.x + 2, self.y + 1))
+
+# Класс препятствий
+class Obstacle:
+    def __init__(self, x, y, width, height, color=DARK_GRAY):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.rect = pygame.Rect(x, y, width, height)
+        
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, (60, 60, 60), self.rect, 2)
+        
+        # Текстура
+        for i in range(0, self.width, 20):
+            pygame.draw.line(screen, (50, 50, 50), 
+                           (self.x + i, self.y), 
+                           (self.x + i, self.y + self.height), 1)
+
+# Класс места для пряток
+class HidingSpot:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = (50, 80, 50)
+        self.rect = pygame.Rect(x, y, width, height)
+        self.occupied = False
+        
+    def draw(self, screen):
+        # Куст/укрытие
+        pygame.draw.ellipse(screen, (30, 80, 30), (self.x - 5, self.y - 5, self.width + 10, self.height + 10))
+        pygame.draw.ellipse(screen, (50, 120, 50), (self.x, self.y, self.width, self.height))
+        
+        # Листья
+        for _ in range(10):
+            lx = self.x + random.randint(0, self.width)
+            ly = self.y + random.randint(0, self.height)
+            size = random.randint(3, 8)
+            pygame.draw.ellipse(screen, (60, 140, 60), (lx, ly, size, size))
+            
+        # Надпись
+        if not self.occupied:
+            hide_text = small_font.render("SPACE - ПРЯТАТЬСЯ", True, (100, 200, 100))
+            screen.blit(hide_text, (self.x - 20, self.y - 25))
+        else:
+            hide_text = small_font.render("ЗАНЯТО", True, RED)
+            screen.blit(hide_text, (self.x, self.y - 25))
+
+# Класс игры
+class Game:
+    def __init__(self):
+        self.player = Player(WIDTH // 2, HEIGHT // 2)
+        self.killer = Killer(100, 100)
+        self.obstacles = []
+        self.hiding_spots = []
+        self.items = []
+        self.score = 0
+        self.time = GAME_DURATION
+        self.game_over = False
+        self.win = False
+        self.paused = False
+        self.difficulty = 1
+        
+        # Создание препятствий и мест для пряток
+        self.create_obstacles()
+        self.create_hiding_spots()
+        
+        # Таймеры
+        self.item_timer = pygame.time.get_ticks()
+        self.difficulty_timer = pygame.time.get_ticks()
+        self.last_time = pygame.time.get_ticks()
+        
+    def create_obstacles(self):
+        obstacles_data = [
+            (200, 200, 100, 20),
+            (400, 150, 20, 100),
+            (600, 300, 150, 20),
+            (900, 200, 20, 120),
+            (300, 500, 20, 100),
+            (700, 500, 120, 20),
+            (1000, 400, 100, 20),
+            (150, 400, 20, 80),
+            (500, 250, 20, 80),
+            (800, 100, 80, 20),
+            (1050, 250, 80, 20),
+            (200, 600, 100, 20),
+            (900, 550, 80, 20)
+        ]
+        for x, y, w, h in obstacles_data:
+            self.obstacles.append(Obstacle(x, y, w, h))
+            
+    def create_hiding_spots(self):
+        hiding_data = [
+            (150, 150, 60, 40),
+            (450, 300, 60, 40),
+            (750, 150, 60, 40),
+            (1050, 450, 60, 40),
+            (300, 400, 60, 40),
+            (850, 400, 60, 40),
+            (150, 550, 60, 40),
+            (600, 150, 60, 40)
+        ]
+        for x, y, w, h in hiding_data:
+            self.hiding_spots.append(HidingSpot(x, y, w, h))
+            
+    def spawn_item(self):
+        attempts = 0
+        while attempts < 50:
+            x = random.randint(50, WIDTH - 50)
+            y = random.randint(50, HEIGHT - 50)
+            item_rect = pygame.Rect(x, y, 20, 20)
+            collides = False
+            for obs in self.obstacles:
+                if item_rect.colliderect(obs.rect):
+                    collides = True
+                    break
+            if not collides and not self.player.rect().colliderect(item_rect):
+                item_type = random.choice(["health", "speed", "stamina"])
+                self.items.append(Item(x, y, item_type))
+                break
+            attempts += 1
+            
+    def update(self):
+        if self.game_over or self.paused:
+            return
+            
+        current_time = pygame.time.get_ticks()
+        
+        # Обновление времени
+        if current_time - self.last_time > 1000:
+            self.time -= 1
+            self.last_time = current_time
+            if self.time <= 0:
+                self.game_over = True
+                self.win = True
+                
+        # Обновление сложности
+        if current_time - self.difficulty_timer > 10000:
+            self.difficulty += 0.1
+            self.killer.speed = KILLER_SPEED * self.difficulty
+            self.difficulty_timer = current_time
+            
+        # Обновление игрока
+        self.player.update(self.obstacles, self.items, self.hiding_spots)
+        
+        # Проверка занятости мест для пряток
+        for spot in self.hiding_spots:
+            if self.player.is_hiding and self.player.hiding_spot == spot:
+                spot.occupied = True
+            else:
+                spot.occupied = False
+                
+        # Обновление убийцы
+        self.killer.update(self.player, self.obstacles)
+        
+        # Спавн предметов
+        if current_time - self.item_timer > ITEM_SPAWN_TIME:
+            self.spawn_item()
+            self.item_timer = current_time
+            
+        # Обновление предметов
+        for item in self.items[:]:
+            item.update()
+            if not item.alive:
+                self.items.remove(item)
+                
+        # Проверка смерти
+        if not self.player.alive:
+            self.game_over = True
+            
+        # Очки выживания
+        if not self.game_over:
+            self.score += 0.1
+            
+    def draw(self, screen):
+        # Фон
+        screen.fill((20, 20, 30))
+        
+        # Пол (сетка)
+        grid_color = (40, 40, 50)
+        for x in range(0, WIDTH, 50):
+            pygame.draw.line(screen, grid_color, (x, 0), (x, HEIGHT), 1)
+        for y in range(0, HEIGHT, 50):
+            pygame.draw.line(screen, grid_color, (0, y), (WIDTH, y), 1)
+            
+        # Препятствия
+        for obstacle in self.obstacles:
+            obstacle.draw(screen)
+            
+        # Места для пряток
+        for spot in self.hiding_spots:
+            spot.draw(screen)
+            
+        # Предметы
+        for item in self.items:
+            item.draw(screen)
+            
+        # Игрок
+        self.player.draw(screen)
+        
+        # Убийца
+        self.killer.draw(screen)
+        
+        # UI
+        self.draw_ui(screen)
+        
+        # Game Over
+        if self.game_over:
+            self.draw_game_over(screen)
+            
+    def draw_ui(self, screen):
+        # Время
+        time_text = font.render(f"⏱️ {self.time}с", True, WHITE)
+        screen.blit(time_text, (10, 10))
+        
+        # Счет
+        score_text = font.render(f"⭐ {int(self.score)}", True, YELLOW)
+        screen.blit(score_text, (10, 50))
+        
+        # Здоровье
+        health_text = font.render("❤️", True, RED)
+        screen.blit(health_text, (10, 90))
+        pygame.draw.rect(screen, (50, 50, 50), (50, 92, 100, 20))
+        health_width = int((self.player.health / 100) * 100)
+        color = GREEN if health_width > 60 else YELLOW if health_width > 30 else RED
+        pygame.draw.rect(screen, color, (50, 92, health_width, 20))
+        
+        # Выносливость
+        stamina_text = font.render("⚡", True, YELLOW)
+        screen.blit(stamina_text, (10, 120))
+        pygame.draw.rect(screen, (50, 50, 50), (50, 122, 100, 20))
+        stamina_width = int((self.player.stamina / self.player.max_stamina) * 100)
+        color = GREEN if stamina_width > 50 else YELLOW if stamina_width > 25 else RED
+        pygame.draw.rect(screen, color, (50, 122, stamina_width, 20))
+        
+        # Расстояние до убийцы
+        dist = math.hypot(self.player.x - self.killer.x, self.player.y - self.killer.y)
+        dist_text = font.render(f"📏 {int(dist)}px", True, LIGHT_BLUE)
+        screen.blit(dist_text, (10, 150))
+        
+        # Сложность
+        diff_text = font.render(f"🔥 x{self.difficulty:.1f}", True, ORANGE)
+        screen.blit(diff_text, (10, 190))
+        
+        # Уровень шума
+        noise_text = font.render(f"🔊 Шум: {int(self.player.noise_level)}%", True, 
+                               YELLOW if self.player.noise_level < 50 else ORANGE if self.player.noise_level < 75 else RED)
+        screen.blit(noise_text, (10, 230))
+        
+        # Статус
+        status = "🏃 БЕГ" if self.player.is_sprinting else "🚶 ХОДЬБА"
+        if self.player.is_hiding:
+            status = "🙈 ПРЯТКИ"
+        if self.player.is_screaming:
+            status = "🔊 КРИК!"
+        status_text = font.render(status, True, CYAN if self.player.is_hiding else WHITE)
+        screen.blit(status_text, (10, 270))
+        
+        # Управление
+        controls = [
+            "WASD / Стрелки - Движение",
+            "SHIFT - Спринт",
+            "SPACE - Прятаться",
+            "E - Крик (отвлечь)",
+            "P - Пауза"
+        ]
+        for i, text in enumerate(controls):
+            ctrl_text = small_font.render(text, True, LIGHT_GRAY)
+            screen.blit(ctrl_text, (WIDTH - 280, 10 + i * 25))
+            
+        # Предупреждение о близости убийцы
+        if dist < 150 and not self.game_over:
+            warn_alpha = min(255, int((1 - dist / 150) * 255))
+            warn_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            pygame.draw.rect(warn_surf, (255, 0, 0, warn_alpha // 4), (0, 0, WIDTH, HEIGHT))
+            screen.blit(warn_surf, (0, 0))
+            
+            if dist < 80:
+                danger_text = big_font.render("⚠️ ОПАСНОСТЬ! ⚠️", True, RED)
+                danger_rect = danger_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                screen.blit(danger_text, danger_rect)
+                
+    def draw_game_over(self, screen):
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        screen.blit(overlay, (0, 0))
+        
+        if self.win:
+            title = big_font.render("🎉 ВЫ ВЫЖИЛИ! 🎉", True, GREEN)
+            subtitle = font.render(f"Время: {GAME_DURATION}с | Счет: {int(self.score)}", True, WHITE)
+        else:
+            title = big_font.render("💀 ВАС УБИЛИ! 💀", True, RED)
+            subtitle = font.render(f"Вы продержались {int(self.score)} секунд", True, WHITE)
+            
+        title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+        subtitle_rect = subtitle.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
+        
+        screen.blit(title, title_rect)
+        screen.blit(subtitle, subtitle_rect)
+        
+        restart_text = font.render("Нажми R для рестарта", True, YELLOW)
+        restart_rect = restart_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 80))
+        screen.blit(restart_text, restart_rect)
+        
+        # Кровавые брызги
+        if not self.win:
+            for _ in range(20):
+                sx = random.randint(0, WIDTH)
+                sy = random.randint(0, HEIGHT)
+                size = random.randint(5, 20)
+                pygame.draw.circle(screen, (100, 0, 0, 50), (sx, sy), size)
+
+# Основная функция
+def main():
+    game = Game()
+    running = True
+    speed_effect_active = False
+    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    game.paused = not game.paused
+                if event.key == pygame.K_r and game.game_over:
+                    game = Game()
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            if event.type == pygame.USEREVENT + 1:
+                if game.player.speed > PLAYER_SPEED:
+                    game.player.speed = PLAYER_SPEED
+                    
+        game.update()
+        game.draw(screen)
+        
+        # Пауза
+        if game.paused and not game.game_over:
+            pause_overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            pause_overlay.fill((0, 0, 0, 150))
+            screen.blit(pause_overlay, (0, 0))
+            pause_text = big_font.render("⏸️ ПАУЗА", True, WHITE)
+            pause_rect = pause_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            screen.blit(pause_text, pause_rect)
+            
+        pygame.display.flip()
+        clock.tick(60)
+        
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
