@@ -3,879 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Матвей Вадимович | Начинающий Backend-разработчик</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>GTA PLATFORMER</title>
     <style>
-        /* ===== Стили для сайта-визитки ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: #0a0000;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* ===== Кровавый фон ===== */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 30% 20%, rgba(180, 0, 0, 0.3), transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(120, 0, 0, 0.4), transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(80, 0, 0, 0.2), transparent 70%),
-                repeating-linear-gradient(45deg, 
-                    transparent, 
-                    transparent 100px,
-                    rgba(100, 0, 0, 0.02) 100px,
-                    rgba(100, 0, 0, 0.02) 101px
-                );
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .blood-mist {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 30%, rgba(200, 0, 0, 0.08), transparent 40%),
-                radial-gradient(ellipse at 80% 70%, rgba(150, 0, 0, 0.06), transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bloodMist 8s infinite alternate ease-in-out;
-        }
-
-        @keyframes bloodMist {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.1); }
-        }
-
-        .blood-drops {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 1;
+            font-family: Arial, sans-serif;
             overflow: hidden;
         }
-
-        .drop {
-            position: absolute;
-            top: -20px;
-            width: 4px;
-            background: rgba(180, 0, 0, 0.6);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            animation: dropFall linear infinite;
-        }
-
-        .drop:nth-child(1) { left: 10%; animation-duration: 4s; animation-delay: 0s; height: 25px; }
-        .drop:nth-child(2) { left: 25%; animation-duration: 5s; animation-delay: 1s; height: 35px; width: 5px; }
-        .drop:nth-child(3) { left: 40%; animation-duration: 3.5s; animation-delay: 0.5s; height: 20px; }
-        .drop:nth-child(4) { left: 55%; animation-duration: 6s; animation-delay: 2s; height: 40px; width: 6px; }
-        .drop:nth-child(5) { left: 70%; animation-duration: 4.5s; animation-delay: 0.8s; height: 28px; }
-        .drop:nth-child(6) { left: 85%; animation-duration: 5.5s; animation-delay: 1.5s; height: 32px; }
-        .drop:nth-child(7) { left: 15%; animation-duration: 3.8s; animation-delay: 2.5s; height: 22px; }
-        .drop:nth-child(8) { left: 50%; animation-duration: 4.2s; animation-delay: 3s; height: 30px; width: 5px; }
-        .drop:nth-child(9) { left: 65%; animation-duration: 5.2s; animation-delay: 0.3s; height: 26px; }
-        .drop:nth-child(10) { left: 90%; animation-duration: 3.9s; animation-delay: 1.8s; height: 18px; }
-
-        @keyframes dropFall {
-            0% { transform: translateY(0) scale(1); opacity: 0.8; }
-            80% { opacity: 0.8; }
-            100% { transform: translateY(110vh) scale(0.5); opacity: 0; }
-        }
-
-        /* ===== КАРТОЧКА ===== */
-        .card {
-            max-width: 1000px;
-            width: 100%;
-            background: rgba(10, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 60px 60px 40px 40px;
-            box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(180, 0, 0, 0.3), 0 0 40px rgba(200, 0, 0, 0.1);
-            padding: 40px 35px;
-            position: relative;
-            z-index: 5;
-            border: 1px solid rgba(180, 0, 0, 0.15);
-            margin-bottom: 30px;
-        }
-
-        /* ===== ЖУТКИЙ ПЕРСОНАЖ ===== */
-        .cartoon-area {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-            height: 160px;
-            position: relative;
-        }
-
-        .horror-scene {
-            position: relative;
-            width: 220px;
-            height: 160px;
-        }
-
-        .red-glow {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 80px;
-            background: radial-gradient(ellipse at center, rgba(200, 0, 0, 0.3), transparent);
-            filter: blur(20px);
-            animation: glowPulse 2s infinite alternate;
-        }
-
-        @keyframes glowPulse {
-            0% { opacity: 0.4; transform: translateX(-50%) scale(0.8); }
-            100% { opacity: 0.8; transform: translateX(-50%) scale(1.3); }
-        }
-
-        .shadow-horror {
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90px;
-            height: 20px;
-            background: radial-gradient(ellipse, rgba(100, 0, 0, 0.4), transparent);
-            border-radius: 50%;
-            animation: shadowHorror 3s infinite alternate;
-        }
-
-        @keyframes shadowHorror {
-            0% { transform: translateX(-50%) scale(1); opacity: 0.4; }
-            100% { transform: translateX(-50%) scale(1.3); opacity: 0.2; }
-        }
-
-        .hooded-figure {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 140px;
-            animation: figureFloat 3.5s infinite ease-in-out;
-        }
-
-        @keyframes figureFloat {
-            0% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
-            50% { transform: translateX(-50%) translateY(-8px) rotate(2deg); }
-            100% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
-        }
-
-        .cloak {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 75px;
-            height: 95px;
-            background: linear-gradient(180deg, #1a0a0a, #0a0000);
-            clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
-            border-radius: 30px 30px 10px 10px;
-            box-shadow: inset -5px 0 20px rgba(200, 0, 0, 0.1);
-            border: 1px solid rgba(100, 0, 0, 0.2);
-        }
-
-        .cloak::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20px;
-            background: linear-gradient(180deg, transparent, rgba(180, 0, 0, 0.1));
-            clip-path: polygon(0 0, 10% 100%, 20% 20%, 30% 100%, 40% 30%, 50% 100%, 60% 10%, 70% 100%, 80% 40%, 90% 100%, 100% 0);
-        }
-
-        .hood {
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 65px;
-            background: linear-gradient(180deg, #1a0a0a, #0a0000);
-            border-radius: 50% 50% 20% 20%;
-            border: 1px solid rgba(100, 0, 0, 0.2);
-        }
-
-        .hood-dark {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 35px;
-            background: #000;
-            border-radius: 50%;
-            box-shadow: inset 0 0 20px rgba(200, 0, 0, 0.2);
-        }
-
-        .red-eyes {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 12px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 2;
-        }
-
-        .red-eye {
-            width: 10px;
-            height: 12px;
-            background: radial-gradient(circle, #ff0000, #880000);
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
-            animation: eyeGlow 1.5s infinite alternate;
-        }
-
-        @keyframes eyeGlow {
-            0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.6), 0 0 20px rgba(255, 0, 0, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.6); }
-        }
-
-        .knife-hand {
-            position: absolute;
-            right: -15px;
-            bottom: 30px;
-            width: 15px;
-            height: 40px;
-            transform: rotate(-30deg);
-            animation: knifeMove 2.5s infinite alternate ease-in-out;
-        }
-
-        .knife-hand::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 25px;
-            background: linear-gradient(180deg, #cccccc, #888888);
-            border-radius: 2px;
-            box-shadow: 0 0 10px rgba(200, 200, 200, 0.2);
-        }
-
-        .knife-hand::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 10px;
-            height: 15px;
-            background: #2a1a1a;
-            border-radius: 3px 3px 5px 5px;
-        }
-
-        @keyframes knifeMove {
-            0% { transform: rotate(-30deg) translateY(0); }
-            100% { transform: rotate(-40deg) translateY(-8px); }
-        }
-
-        .hand-left {
-            position: absolute;
-            left: -15px;
-            bottom: 25px;
-            width: 12px;
-            height: 30px;
-            background: #1a0a0a;
-            border-radius: 5px;
-            transform: rotate(20deg);
-            animation: handLeftMove 3s infinite alternate;
-        }
-
-        @keyframes handLeftMove {
-            0% { transform: rotate(20deg) translateY(0); }
-            100% { transform: rotate(30deg) translateY(-5px); }
-        }
-
-        .blood-splatter {
-            position: absolute;
-            bottom: 20px;
-            left: -10px;
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(180, 0, 0, 0.2), transparent);
-            border-radius: 50%;
-            filter: blur(5px);
-        }
-
-        .blood-splatter.right {
-            left: auto;
-            right: -10px;
-        }
-
-        /* ===== ШАПКА ===== */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff0000, #880000, #ff0000);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -1px;
-            text-shadow: 0 0 40px rgba(255, 0, 0, 0.2);
-            animation: titleBlood 3s infinite alternate;
-            position: relative;
-            display: inline-block;
-        }
-
-        .header h1::after {
-            content: 'Матвей Вадимович';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(255, 0, 0, 0.1) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            filter: blur(4px);
-            opacity: 0.5;
-            z-index: -1;
-        }
-
-        @keyframes titleBlood {
-            0% { text-shadow: 0 0 20px rgba(255, 0, 0, 0.2); }
-            100% { text-shadow: 0 0 50px rgba(255, 0, 0, 0.5), 0 0 80px rgba(200, 0, 0, 0.2); }
-        }
-
-        .header .tagline {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #aa5555;
-            background: rgba(30, 0, 0, 0.5);
-            display: inline-block;
-            padding: 8px 28px;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
-            margin-top: 4px;
-            border: 1px solid rgba(180, 0, 0, 0.2);
-        }
-
-        .header .location {
-            margin-top: 10px;
-            font-weight: 500;
-            color: #884444;
-            background: rgba(20, 0, 0, 0.5);
-            display: inline-block;
-            padding: 4px 18px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            border: 1px solid rgba(180, 0, 0, 0.15);
-        }
-
-        /* ===== КНОПКА С ВЕСЁЛЫМ СМАЙЛИКОМ ===== */
-        .smile-btn-container {
-            text-align: center;
-            margin: 20px 0 25px;
-        }
-
-        .smile-btn {
-            background: linear-gradient(135deg, #1a0000, #3a0000);
-            color: #ffcc00;
-            border: 2px solid #ffcc00;
-            padding: 15px 40px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.1), inset 0 0 30px rgba(255, 204, 0, 0.05);
-            font-family: 'Montserrat', sans-serif;
-            position: relative;
-            overflow: hidden;
-            animation: btnPulse 2s infinite alternate;
-        }
-
-        .smile-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 204, 0, 0.1), transparent 60%);
-            animation: btnGlow 3s infinite alternate;
-        }
-
-        @keyframes btnGlow {
-            0% { transform: scale(0.8); opacity: 0.3; }
-            100% { transform: scale(1.5); opacity: 0.8; }
-        }
-
-        @keyframes btnPulse {
-            0% { box-shadow: 0 0 20px rgba(255, 204, 0, 0.1); }
-            100% { box-shadow: 0 0 60px rgba(255, 204, 0, 0.3), 0 0 100px rgba(255, 204, 0, 0.1); }
-        }
-
-        .smile-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #2a0000, #5a0000);
-            box-shadow: 0 0 80px rgba(255, 204, 0, 0.4);
-        }
-
-        .smile-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ===== СМАЙЛИК ОВЕРЛЕЙ ===== */
-        .smile-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            animation: smileAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        .smile-overlay.active {
-            display: flex;
-        }
-
-        @keyframes smileAppear {
-            0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-
-        .smile-content {
-            text-align: center;
-            animation: smileBounce 1s infinite alternate ease-in-out;
-            position: relative;
-        }
-
-        @keyframes smileBounce {
-            0% { transform: translateY(0px) scale(1); }
-            100% { transform: translateY(-30px) scale(1.05); }
-        }
-
-        .smile-emoji {
-            font-size: 250px;
-            line-height: 1;
-            animation: smileSpin 8s infinite linear;
-            filter: drop-shadow(0 0 80px rgba(255, 204, 0, 0.6));
-            display: inline-block;
-        }
-
-        @keyframes smileSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .sparkles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            overflow: visible;
-        }
-
-        .sparkle {
-            position: absolute;
-            font-size: 30px;
-            animation: sparkleFloat 3s infinite alternate ease-in-out;
-        }
-
-        .sparkle:nth-child(1) { top: -40px; left: -40px; animation-delay: 0s; }
-        .sparkle:nth-child(2) { top: -40px; right: -40px; animation-delay: 0.5s; }
-        .sparkle:nth-child(3) { bottom: -40px; left: -40px; animation-delay: 1s; }
-        .sparkle:nth-child(4) { bottom: -40px; right: -40px; animation-delay: 1.5s; }
-        .sparkle:nth-child(5) { top: -60px; left: 50%; transform: translateX(-50%); animation-delay: 0.8s; }
-        .sparkle:nth-child(6) { bottom: -60px; left: 50%; transform: translateX(-50%); animation-delay: 1.8s; }
-
-        @keyframes sparkleFloat {
-            0% { transform: translateY(0px) scale(0.8) rotate(0deg); opacity: 0.3; }
-            100% { transform: translateY(-20px) scale(1.2) rotate(180deg); opacity: 1; }
-        }
-
-        .smile-text {
-            color: #ffcc00;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-top: 30px;
-            text-shadow: 0 0 40px rgba(255, 204, 0, 0.5);
-            animation: textHappy 1s infinite alternate;
-            letter-spacing: 5px;
-        }
-
-        @keyframes textHappy {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.05); opacity: 1; }
-        }
-
-        .smile-close-hint {
-            color: #886644;
-            font-size: 0.9rem;
-            margin-top: 20px;
-            opacity: 0.6;
-            animation: hintBlink 1.5s infinite alternate;
-        }
-
-        @keyframes hintBlink {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.8; }
-        }
-
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10000;
-            overflow: hidden;
-            display: none;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            top: -10px;
-            animation: confettiFall linear infinite;
-        }
-
-        .confetti:nth-child(1) { left: 5%; animation-duration: 4s; animation-delay: 0s; background: #ff0000; }
-        .confetti:nth-child(2) { left: 15%; animation-duration: 3.5s; animation-delay: 0.5s; background: #ffcc00; }
-        .confetti:nth-child(3) { left: 25%; animation-duration: 5s; animation-delay: 0.2s; background: #00ff00; }
-        .confetti:nth-child(4) { left: 35%; animation-duration: 4.5s; animation-delay: 0.8s; background: #ff00ff; }
-        .confetti:nth-child(5) { left: 45%; animation-duration: 3.8s; animation-delay: 0.3s; background: #00ccff; }
-        .confetti:nth-child(6) { left: 55%; animation-duration: 4.2s; animation-delay: 1s; background: #ff6600; }
-        .confetti:nth-child(7) { left: 65%; animation-duration: 5.2s; animation-delay: 0.6s; background: #ff00ff; }
-        .confetti:nth-child(8) { left: 75%; animation-duration: 3.3s; animation-delay: 0.9s; background: #ffff00; }
-        .confetti:nth-child(9) { left: 85%; animation-duration: 4.7s; animation-delay: 0.4s; background: #00ff00; }
-        .confetti:nth-child(10) { left: 95%; animation-duration: 3.9s; animation-delay: 0.7s; background: #ff0000; }
-        .confetti:nth-child(11) { left: 10%; animation-duration: 4.8s; animation-delay: 1.2s; background: #ffcc00; }
-        .confetti:nth-child(12) { left: 50%; animation-duration: 3.6s; animation-delay: 0.1s; background: #00ccff; }
-
-        @keyframes confettiFall {
-            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
-        }
-
-        /* ===== БАДЖИ ===== */
-        .badge-section {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin: 25px 0 30px;
-        }
-
-        .badge {
-            background: rgba(20, 0, 0, 0.8);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #cc8888;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 4px 15px rgba(0,0,0,0.2);
-            transition: 0.1s ease;
-            border: 1px solid rgba(180, 0, 0, 0.15);
-            letter-spacing: 0.4px;
-        }
-
-        .badge.python { background: rgba(180, 0, 0, 0.2); border-color: #cc0000; color: #ff6666; }
-        .badge.django { background: rgba(0, 180, 0, 0.1); border-color: #006600; color: #66aa66; }
-        .badge.js { background: rgba(180, 180, 0, 0.1); border-color: #888800; color: #bbbb44; }
-        .badge.git { background: rgba(180, 100, 0, 0.15); border-color: #884400; color: #cc8844; }
-        .badge.sql { background: rgba(0, 100, 180, 0.1); border-color: #004488; color: #4488bb; }
-        .badge.api { background: rgba(150, 0, 180, 0.1); border-color: #660088; color: #aa66bb; }
-
-        /* ===== ПРОЕКТЫ ===== */
-        .projects {
-            background: rgba(10, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 40px;
-            padding: 25px 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(180, 0, 0, 0.1);
-        }
-
-        .projects h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #cc8888;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .project-item {
-            background: rgba(20, 0, 0, 0.5);
-            border-radius: 28px;
-            padding: 18px 22px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-            transition: 0.15s;
-            border: 1px solid rgba(180, 0, 0, 0.1);
-        }
-
-        .project-item:last-child { margin-bottom: 0; }
-
-        .project-item strong {
-            display: block;
-            font-size: 1.2rem;
-            color: #dd9999;
-            margin-bottom: 4px;
-        }
-
-        .project-item a {
-            color: #ff4444;
-            font-weight: 600;
-            text-decoration: none;
-            border-bottom: 2px solid rgba(255, 0, 0, 0.2);
-            transition: 0.15s;
-        }
-
-        .project-item a:hover {
-            color: #ff6666;
-            border-bottom-color: #ff0000;
-        }
-
-        .project-item .desc {
-            margin-top: 6px;
-            color: #aa7777;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        /* ===== СКИЛЛЫ ===== */
-        .skills-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #cc8888;
-            margin-bottom: 18px;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        .skill-card {
-            background: rgba(20, 0, 0, 0.5);
-            border-radius: 30px;
-            padding: 18px 16px 14px;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid rgba(180, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skill-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(200, 0, 0, 0.05), transparent 60%);
-            opacity: 0;
-            transition: 0.3s;
-        }
-
-        .skill-card:hover::before {
-            opacity: 1;
-        }
-
-        .skill-card:hover {
-            transform: scale(1.02);
-            border-color: rgba(180, 0, 0, 0.3);
-            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 0 30px rgba(200, 0, 0, 0.05);
-        }
-
-        .skill-card .skill-name {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #dd9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .skill-card .skill-emoji {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
-
-        .skill-card .skill-desc {
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            transition: max-height 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.3s, margin 0.2s;
-            color: #aa7777;
-            font-weight: 500;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-top: 0px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            padding: 0 12px;
-            border: 1px solid rgba(180, 0, 0, 0.05);
-        }
-
-        .skill-card.open .skill-desc {
-            max-height: 180px;
-            opacity: 1;
-            margin-top: 14px;
-            padding: 12px 12px;
-        }
-
-        .skill-card .click-hint {
-            font-size: 0.7rem;
-            color: #664444;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            margin-top: 6px;
-            opacity: 0.7;
-        }
-
-        .footer-note {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #664444;
-            font-weight: 500;
-            border-top: 1px solid rgba(180, 0, 0, 0.1);
-            padding-top: 18px;
-        }
-
-        /* ===== АДАПТИВ ===== */
-        @media (max-width: 650px) {
-            .card { padding: 25px 18px; border-radius: 40px; }
-            .header h1 { font-size: 2rem; }
-            .badge-section { gap: 8px; }
-            .badge { font-size: 0.7rem; padding: 5px 14px; }
-            .skills-grid { grid-template-columns: 1fr 1fr; }
-            .project-item strong { font-size: 1rem; }
-            .horror-scene { transform: scale(0.7); }
-            .cartoon-area { height: 120px; }
-            .smile-emoji { font-size: 150px; }
-            .smile-text { font-size: 1.8rem; }
-            .smile-btn { padding: 12px 25px; font-size: 1rem; }
-        }
-
-        @media (max-width: 430px) {
-            .skills-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.6rem; }
-            .horror-scene { transform: scale(0.5); }
-            .cartoon-area { height: 90px; }
-            .smile-emoji { font-size: 100px; }
-            .smile-text { font-size: 1.2rem; }
-            .sparkle { font-size: 20px; }
-        }
-
-        /* ===== Стили для игры ===== */
+        
         #gameContainer {
-            max-width: 1200px;
-            width: 100%;
             position: relative;
+            border: 3px solid #444;
             border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 150, 255, 0.2);
-            border: 2px solid rgba(180, 0, 0, 0.3);
-            z-index: 5;
+            box-shadow: 0 0 50px rgba(0, 150, 255, 0.3);
         }
-
-        #gameContainer canvas {
+        
+        canvas {
             display: block;
-            width: 100%;
-            height: auto;
+            border-radius: 8px;
             background: #87CEEB;
         }
-
-        #gameUI {
+        
+        #ui {
             position: absolute;
             top: 10px;
             left: 10px;
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             font-family: 'Courier New', monospace;
             pointer-events: none;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             z-index: 10;
+        }
+        
+        #ui > div {
+            margin: 3px 0;
+            padding: 2px 8px;
             background: rgba(0,0,0,0.5);
-            padding: 8px 12px;
-            border-radius: 8px;
-            line-height: 1.6;
-        }
-
-        #gameUI div {
+            border-radius: 4px;
             display: inline-block;
-            margin-right: 15px;
         }
-
-        #gameControls {
+        
+        #controls {
             position: absolute;
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             color: white;
-            font-size: 11px;
+            font-size: 12px;
             font-family: 'Courier New', monospace;
             background: rgba(0,0,0,0.7);
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 8px;
             pointer-events: none;
             z-index: 10;
             text-align: center;
             white-space: nowrap;
         }
-
-        #wantedAlert {
+        
+        #wanted {
             position: absolute;
             top: 60px;
             left: 50%;
@@ -888,19 +84,19 @@
             z-index: 10;
             animation: blink 0.5s infinite;
         }
-
+        
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-
-        #phoneOverlay {
+        
+        #phone {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
-            height: 400px;
+            width: 320px;
+            height: 420px;
             background: rgba(20,20,30,0.95);
             border: 2px solid #555;
             border-radius: 15px;
@@ -911,23 +107,23 @@
             font-family: 'Courier New', monospace;
             box-shadow: 0 0 50px rgba(0,0,0,0.9);
         }
-
-        #phoneOverlay h2 {
+        
+        #phone h2 {
             text-align: center;
             color: #00FFFF;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 10px;
         }
-
-        #phoneOverlay .info {
-            font-size: 12px;
+        
+        #phone .info {
+            font-size: 13px;
             margin: 3px 0;
             padding: 2px 5px;
             border-bottom: 1px solid #333;
         }
-
-        #phoneOverlay .message {
-            font-size: 12px;
+        
+        #phone .message {
+            font-size: 13px;
             color: #FFFF00;
             margin-top: 10px;
             padding: 10px;
@@ -935,15 +131,15 @@
             border-radius: 5px;
             min-height: 40px;
         }
-
-        #phoneOverlay .buttons {
+        
+        #phone .buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 15px;
         }
-
-        #phoneOverlay .buttons button {
-            padding: 6px 16px;
+        
+        #phone .buttons button {
+            padding: 8px 20px;
             border: none;
             border-radius: 5px;
             background: #444;
@@ -952,1427 +148,1634 @@
             font-family: 'Courier New', monospace;
             transition: background 0.3s;
         }
-
-        #phoneOverlay .buttons button:hover {
+        
+        #phone .buttons button:hover {
             background: #666;
         }
-
-        #phoneOverlay .close-btn {
+        
+        #phone .close-btn {
             background: #800000 !important;
         }
-
-        #phoneOverlay .close-btn:hover {
+        
+        #phone .close-btn:hover {
             background: #aa0000 !important;
         }
-
+        
         .health-bar {
             display: inline-block;
-            width: 80px;
-            height: 10px;
+            width: 100px;
+            height: 12px;
             background: #333;
-            border-radius: 5px;
+            border-radius: 6px;
             overflow: hidden;
             vertical-align: middle;
             margin-left: 5px;
         }
-
+        
         .health-fill {
             height: 100%;
             background: #00ff00;
             transition: width 0.3s;
-            border-radius: 5px;
+            border-radius: 6px;
         }
-
+        
         .health-fill.danger {
             background: #ff0000;
-        }
-
-        @media (max-width: 700px) {
-            #gameUI { font-size: 11px; padding: 4px 8px; }
-            #gameUI div { margin-right: 8px; }
-            #gameControls { font-size: 9px; padding: 4px 10px; white-space: normal; }
-            #wantedAlert { font-size: 20px; top: 50px; }
-            #phoneOverlay { width: 260px; height: 360px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Кровавый фон -->
-    <div class="blood-mist"></div>
-    <div class="blood-drops">
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="1200" height="700"></canvas>
+    
+    <div id="ui">
+        <div>❤️ Здоровье: <span id="healthDisplay">100</span></div>
+        <div>💰 Деньги: $<span id="moneyDisplay">0</span></div>
+        <div>🔫 <span id="weaponDisplay">Нет</span></div>
+        <div>❤️x<span id="livesDisplay">3</span></div>
+        <div>👤 <span id="playerNameDisplay">Герой</span></div>
+        <div><span id="wantedDisplay">✅ Чисто</span></div>
+        <div><span id="statusDisplay"></span></div>
     </div>
-
-    <!-- ===== САЙТ-ВИЗИТКА ===== -->
-    <div class="card">
-
-        <div class="cartoon-area">
-            <div class="horror-scene">
-                <div class="red-glow"></div>
-                <div class="shadow-horror"></div>
-                <div class="blood-splatter"></div>
-                <div class="blood-splatter right"></div>
-                <div class="hooded-figure">
-                    <div class="hood">
-                        <div class="hood-dark"></div>
-                        <div class="red-eyes">
-                            <div class="red-eye"></div>
-                            <div class="red-eye"></div>
-                        </div>
-                    </div>
-                    <div class="cloak"></div>
-                    <div class="knife-hand"></div>
-                    <div class="hand-left"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="header">
-            <h1>Матвей Вадимович</h1>
-            <div class="tagline">⚡ Начинающий Backend-разработчик</div>
-            <div class="location">📍 Курортный поселок Нарочь, Беларусь</div>
-        </div>
-
-        <div class="smile-btn-container">
-            <button class="smile-btn" id="smileBtn">😊 НАЖМИ МЕНЯ!</button>
-        </div>
-
-        <div class="badge-section">
-            <span class="badge python">🐍 Python</span>
-            <span class="badge django">🌿 Django</span>
-            <span class="badge js">🟨 JavaScript</span>
-            <span class="badge git">🔀 Git</span>
-            <span class="badge sql">🗄️ SQL</span>
-            <span class="badge api">🔗 REST API</span>
-            <span class="badge" style="background:rgba(180,0,0,0.15); border-color:#cc0000; color:#ff6666;">🎓 itMouse</span>
-            <span class="badge" style="background:rgba(200,0,0,0.1); border-color:#880000; color:#cc4444;">🚀 15 лет</span>
-        </div>
-
-        <div class="projects">
-            <h2>📁 Мои проекты</h2>
-            <div class="project-item">
-                <strong>🎵 Трек «Стекло не бьется»</strong>
-                <div class="desc">
-                    <a href="https://suno.com/s/9O2ldKqHV223dlXz" target="_blank">Слушать на Suno</a> — мой первый музыкальный эксперимент.
-                </div>
-            </div>
-            <div class="project-item">
-                <strong>🛒 Интернет-магазин (Django)</strong>
-                <div class="desc">Полноценный интернет-магазин на Python + Django. Реализованы модели, админка, корзина, заказы.</div>
-            </div>
-            <div class="project-item">
-                <strong>🧑‍💻 Школа itMouse</strong>
-                <div class="desc">Учусь разработке, создаю проекты и прокачиваю скиллы каждый день.</div>
-            </div>
-        </div>
-
-        <div class="skills-title">🧠 Мои навыки <span style="font-size:0.9rem; font-weight:500; color:#664444;">(нажми на карточку)</span></div>
-        <div class="skills-grid" id="skillsGrid">
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🐍</span> Python</div>
-                <div class="skill-desc">Уверенное владение: ООП, работа с файлами, декораторы, генераторы, асинхронность.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🌿</span> Django</div>
-                <div class="skill-desc">Создаю веб-приложения: модели, views, templates, админка, маршруты, формы.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🟨</span> JavaScript</div>
-                <div class="skill-desc">Базовый JS: DOM-манипуляции, события, fetch, работа с API.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🗄️</span> SQL</div>
-                <div class="skill-desc">PostgreSQL, SQLite. Сложные запросы, JOIN, агрегации, индексы.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🔗</span> REST API</div>
-                <div class="skill-desc">Создание и интеграция RESTful API, JSON, методы GET/POST/PUT/DELETE.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-name"><span class="skill-emoji">🧰</span> Git / GitHub</div>
-                <div class="skill-desc">Версионирование, ветки, merge, pull requests, работа в команде.</div>
-                <div class="click-hint">▼ нажми</div>
-            </div>
-        </div>
-
-        <div class="footer-note">
-            ⚡ Матвей Вадимович, 15 лет · Нарочь · Беларусь
+    
+    <div id="wanted">⚠️ ПОЛИЦИЯ СТРЕЛЯЕТ! ⚠️</div>
+    
+    <div id="controls">
+        ← → / A D - Движение | SHIFT - Бег | SPACE - Прыжок | E - Вход/Выход | H - Аптечка | F - Взять оружие | TAB - Смена героя | T - Телефон
+    </div>
+    
+    <div id="phone">
+        <h2>📱 ТЕЛЕФОН</h2>
+        <div id="phoneInfo"></div>
+        <div class="message" id="phoneMessage">Добро пожаловать в GTA!</div>
+        <div class="buttons">
+            <button class="close-btn" onclick="closePhone()">T - Закрыть</button>
+            <button onclick="nextMessage()">Q - Далее</button>
         </div>
     </div>
+</div>
 
-    <!-- ===== ИГРА GTA PLATFORMER ===== -->
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="1200" height="700"></canvas>
+<script>
+// ======================== ИНИЦИАЛИЗАЦИЯ ========================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const WIDTH = 1200;
+const HEIGHT = 700;
 
-        <div id="gameUI">
-            <div>❤️ Здоровье: <span id="healthDisplay">100</span></div>
-            <div>💰 Деньги: $<span id="moneyDisplay">0</span></div>
-            <div>🔫 <span id="weaponDisplay">Нет</span></div>
-            <div>❤️x<span id="livesDisplay">3</span></div>
-            <div>👤 <span id="playerNameDisplay">Герой</span></div>
-            <div><span id="wantedDisplay">✅ Чисто</span></div>
-            <div><span id="statusDisplay"></span></div>
-        </div>
+// ======================== КОНСТАНТЫ ========================
+const MAP_WIDTH = 4000;
+const MAP_HEIGHT = 2500;
+const GRAVITY = 0.6;
+const JUMP_POWER = -12;
+const GROUND_LEVEL = MAP_HEIGHT - 40;
 
-        <div id="wantedAlert">⚠️ ПОЛИЦИЯ СТРЕЛЯЕТ! ⚠️</div>
+// ======================== СОСТОЯНИЕ ИГРЫ ========================
+let camera = { x: 0, y: 0 };
+let keys = {};
+let mouse = { x: 0, y: 0, button: false, rightButton: false };
+let phoneOpen = false;
+let currentMessageIndex = 0;
 
-        <div id="gameControls">
-            ← → / A D - Движение | SHIFT - Бег | SPACE - Прыжок | E - Вход/Выход | H - Аптечка | F - Взять оружие | TAB - Смена героя | T - Телефон
-        </div>
-
-        <div id="phoneOverlay">
-            <h2>📱 ТЕЛЕФОН</h2>
-            <div id="phoneInfo"></div>
-            <div class="message" id="phoneMessage">Добро пожаловать в GTA!</div>
-            <div class="buttons">
-                <button class="close-btn" onclick="closePhone()">T - Закрыть</button>
-                <button onclick="nextMessage()">Q - Далее</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== СМАЙЛИК ОВЕРЛЕЙ ===== -->
-    <div class="smile-overlay" id="smileOverlay">
-        <div class="smile-content">
-            <div class="sparkles">
-                <span class="sparkle">✨</span>
-                <span class="sparkle">⭐</span>
-                <span class="sparkle">🌟</span>
-                <span class="sparkle">✨</span>
-                <span class="sparkle">⭐</span>
-                <span class="sparkle">🌟</span>
-            </div>
-            <div class="smile-emoji">😊</div>
-            <div class="smile-text">🎉 ТЫ КРУТ! 🎉</div>
-            <div class="smile-close-hint">👆 Нажми в любом месте, чтобы закрыть</div>
-        </div>
-    </div>
-
-    <div class="confetti-container" id="confettiContainer">
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-        <div class="confetti"></div>
-    </div>
-
-    <script>
-        // ========================================================================
-        // 1. СКРИПТ ДЛЯ САЙТА-ВИЗИТКИ (смайлик и карточки)
-        // ========================================================================
-        (function() {
-            const smileBtn = document.getElementById('smileBtn');
-            const smileOverlay = document.getElementById('smileOverlay');
-            const confettiContainer = document.getElementById('confettiContainer');
-            let isSmileActive = false;
-
-            function showSmile() {
-                if (isSmileActive) return;
-                isSmileActive = true;
-                smileOverlay.classList.add('active');
-                confettiContainer.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-            }
-
-            function hideSmile() {
-                smileOverlay.classList.remove('active');
-                confettiContainer.style.display = 'none';
-                document.body.style.overflow = '';
-                isSmileActive = false;
-            }
-
-            smileBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                showSmile();
-            });
-
-            smileOverlay.addEventListener('click', function(e) {
-                if (e.target === smileOverlay || e.target.closest('.smile-content')) {
-                    hideSmile();
-                }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && isSmileActive) {
-                    hideSmile();
-                }
-            });
-
-            // Раскрытие карточек скиллов
-            const cards = document.querySelectorAll('.skill-card');
-            cards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    this.classList.toggle('open');
-                    const hint = this.querySelector('.click-hint');
-                    if (hint) {
-                        hint.textContent = this.classList.contains('open') ? '▲ скрыть' : '▼ нажми';
-                    }
-                });
-            });
-        })();
-
-        // ========================================================================
-        // 2. СКРИПТ ДЛЯ ИГРЫ GTA PLATFORMER
-        // ========================================================================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const W = 1200, H = 700;
-
-        // Константы игры
-        const MAP_W = 4000;
-        const MAP_H = 2500;
-        const GROUND_Y = MAP_H - 40;
-        const GRAVITY = 0.6;
-        const JUMP_POWER = -12;
-
-        // Состояние игры
-        let camera = { x: 0, y: 0 };
-        let keys = {};
-        let mouse = { x: 0, y: 0, button: false, right: false };
-        let phoneOpen = false;
-        let msgIndex = 0;
-
-        // ========================================================================
-        // КЛАССЫ ИГРЫ
-        // ========================================================================
-
-        class Bullet {
-            constructor(x, y, tx, ty, shooter = 'player') {
-                this.x = x;
-                this.y = y;
-                this.radius = 4;
-                this.shooter = shooter;
-                this.damage = shooter === 'player' ? 25 : 10;
-                this.speed = shooter === 'player' ? 12 : 8;
-                this.alive = true;
-                const dx = tx - x, dy = ty - y;
-                const d = Math.hypot(dx, dy);
-                if (d > 0) { this.vx = (dx/d) * this.speed; this.vy = (dy/d) * this.speed; }
-                else { this.vx = 1; this.vy = 0; }
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > MAP_W || this.y < 0 || this.y > MAP_H) this.alive = false;
-            }
-            draw(ctx, cx, cy) {
-                if (!this.alive) return;
-                const sx = this.x - cx, sy = this.y - cy;
-                const color = this.shooter === 'player' ? '#FFD700' : '#FF4444';
-                ctx.beginPath();
-                ctx.arc(sx, sy, this.radius, 0, Math.PI*2);
-                ctx.fillStyle = color;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = color;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
+// ======================== КЛАССЫ ========================
+class Bullet {
+    constructor(x, y, targetX, targetY, shooter = 'player') {
+        this.x = x;
+        this.y = y;
+        this.radius = 4;
+        this.shooter = shooter;
+        this.damage = shooter === 'player' ? 25 : 10;
+        this.speed = shooter === 'player' ? 12 : 8;
+        this.alive = true;
+        
+        const dx = targetX - x;
+        const dy = targetY - y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+            this.vx = (dx / dist) * this.speed;
+            this.vy = (dy / dist) * this.speed;
+        } else {
+            this.vx = 1;
+            this.vy = 0;
         }
-
-        class Platform {
-            constructor(x, y, w, h, color = '#4169E1') {
-                this.x = x; this.y = y; this.w = w; this.h = h; this.color = color;
-            }
-            draw(ctx, cx, cy) {
-                const sx = this.x - cx, sy = this.y - cy;
-                if (sx + this.w < -50 || sx > W + 50 || sy + this.h < -50 || sy > H + 50) return;
-                ctx.fillStyle = this.color;
-                ctx.fillRect(sx, sy, this.w, this.h);
-            }
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > MAP_WIDTH || this.y < 0 || this.y > MAP_HEIGHT) {
+            this.alive = false;
         }
+    }
+    
+    draw(ctx, camX, camY) {
+        if (!this.alive) return;
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        const color = this.shooter === 'player' ? '#FFD700' : '#FF4444';
+        ctx.beginPath();
+        ctx.arc(sx, sy, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
 
-        class Building {
-            constructor(x, y, w, h, color = '#B0B0C8', name = 'Здание') {
-                this.x = x; this.y = y; this.w = w; this.h = h;
-                this.color = color; this.name = name;
-                this.isInside = false;
-                this.healthPack = Math.random() > 0.5;
-                this.npcsInside = [];
-                this.maxNpcs = Math.floor(Math.random() * 4) + 3;
-                this.weaponSpawn = Math.random() > 0.5;
-                this.weaponType = this.weaponSpawn ? ['pistol','shotgun','rifle','uzi'][Math.floor(Math.random()*4)] : null;
-                this.doorX = x + w/2 - 20;
-                this.doorY = y - 35;
-            }
-            draw(ctx, cx, cy) {
-                const sx = this.x - cx, sy = this.y - cy - this.h;
-                if (sx + this.w < -50 || sx > W + 50 || sy + this.h < -50 || sy > H + 50) return;
-                if (!this.isInside) {
-                    ctx.fillStyle = '#555';
-                    ctx.fillRect(sx, sy + this.h, this.w, 10);
-                    ctx.fillStyle = this.color;
-                    ctx.fillRect(sx, sy, this.w, this.h);
-                    ctx.beginPath();
-                    ctx.moveTo(sx - 10, sy);
-                    ctx.lineTo(sx + this.w/2, sy - 20);
-                    ctx.lineTo(sx + this.w + 10, sy);
-                    ctx.fillStyle = '#666680';
-                    ctx.fill();
-                    for (let i = 0; i < 3; i++) for (let j = 0; j < 4; j++) {
-                        const wx = sx + 15 + i*35, wy = sy + 15 + j*30;
-                        ctx.fillStyle = '#6495ED';
-                        ctx.fillRect(wx, wy, 20, 20);
-                        ctx.strokeStyle = '#555';
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(wx, wy, 20, 20);
-                    }
-                    const dsx = this.doorX - cx, dsy = this.doorY - cy;
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(dsx, dsy, 40, 35);
-                    ctx.strokeStyle = '#5C2E0A';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(dsx, dsy, 40, 35);
-                    ctx.fillStyle = '#FFD700';
-                    ctx.beginPath();
-                    ctx.arc(dsx + 35, dsy + 20, 4, 0, Math.PI*2);
-                    ctx.fill();
-                    ctx.fillStyle = '#FFF';
-                    ctx.font = '14px monospace';
-                    ctx.fillText('🏢 ' + this.name, sx, sy - 10);
-                    if (this.weaponSpawn) {
-                        ctx.fillStyle = '#FF4444';
-                        ctx.font = '12px monospace';
-                        ctx.fillText('🔫 ' + this.weaponType, sx, sy - 25);
-                    }
-                    if (this.healthPack) {
-                        ctx.fillStyle = '#FF4444';
-                        ctx.font = '16px monospace';
-                        ctx.fillText('💊', sx + this.w - 25, sy + 20);
-                    }
-                } else {
-                    ctx.fillStyle = '#323246';
-                    ctx.fillRect(sx, sy, this.w, this.h);
-                    ctx.fillStyle = '#3C3C50';
-                    ctx.fillRect(sx + 10, sy + this.h - 20, this.w - 20, 20);
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(sx + 20, sy + 50, 80, 20);
-                    ctx.fillRect(sx + 120, sy + 50, 40, 20);
-                    ctx.fillStyle = '#666';
-                    ctx.fillRect(sx + this.w - 50, sy + 20, 30, 40);
+class Weapon {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.width = 20;
+        this.height = 20;
+        this.alive = true;
+        
+        const weapons = {
+            pistol: { name: 'Пистолет', damage: 25, speed: 12, color: '#888', ammo: 30 },
+            shotgun: { name: 'Дробовик', damage: 40, speed: 8, color: '#8B4513', ammo: 15 },
+            rifle: { name: 'Винтовка', damage: 50, speed: 15, color: '#444', ammo: 20 },
+            uzi: { name: 'УЗИ', damage: 15, speed: 10, color: '#CCC', ammo: 40 }
+        };
+        
+        const w = weapons[type] || weapons.pistol;
+        this.name = w.name;
+        this.damage = w.damage;
+        this.speed = w.speed;
+        this.color = w.color;
+        this.ammo = w.ammo;
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx < -50 || sx > WIDTH + 50 || sy < -50 || sy > HEIGHT + 50) return;
+        
+        // Свечение
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = 'rgba(255,255,100,0.3)';
+        ctx.fillStyle = this.color;
+        ctx.fillRect(sx, sy, this.width, this.height);
+        ctx.shadowBlur = 0;
+        
+        ctx.fillStyle = '#FFD700';
+        ctx.font = '12px monospace';
+        ctx.fillText(this.name, sx - 5, sy - 10);
+    }
+}
+
+class Platform {
+    constructor(x, y, width, height, color = '#4169E1') {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx + this.width < -50 || sx > WIDTH + 50 || sy + this.height < -50 || sy > HEIGHT + 50) return;
+        ctx.fillStyle = this.color;
+        ctx.fillRect(sx, sy, this.width, this.height);
+    }
+}
+
+class Building {
+    constructor(x, y, width, height, color = '#B0B0C8', name = 'Здание') {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+        this.name = name;
+        this.isInside = false;
+        this.healthPack = Math.random() > 0.5;
+        this.npcsInside = [];
+        this.maxNpcs = Math.floor(Math.random() * 4) + 3;
+        this.weaponSpawn = Math.random() > 0.5;
+        this.weaponType = this.weaponSpawn ? ['pistol', 'shotgun', 'rifle', 'uzi'][Math.floor(Math.random() * 4)] : null;
+        this.doorX = x + width/2 - 20;
+        this.doorY = y - 35;
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY - this.height;
+        if (sx + this.width < -50 || sx > WIDTH + 50 || sy + this.height < -50 || sy > HEIGHT + 50) return;
+        
+        if (!this.isInside) {
+            // Фундамент
+            ctx.fillStyle = '#555';
+            ctx.fillRect(sx, sy + this.height, this.width, 10);
+            
+            // Стены
+            ctx.fillStyle = this.color;
+            ctx.fillRect(sx, sy, this.width, this.height);
+            
+            // Крыша
+            ctx.beginPath();
+            ctx.moveTo(sx - 10, sy);
+            ctx.lineTo(sx + this.width/2, sy - 20);
+            ctx.lineTo(sx + this.width + 10, sy);
+            ctx.fillStyle = '#666680';
+            ctx.fill();
+            
+            // Окна
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const wx = sx + 15 + i * 35;
+                    const wy = sy + 15 + j * 30;
+                    ctx.fillStyle = '#6495ED';
+                    ctx.fillRect(wx, wy, 20, 20);
                     ctx.strokeStyle = '#555';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(sx + this.w - 50, sy + 20, 30, 40);
-                    const dsx = this.doorX - cx, dsy = this.doorY - cy;
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(dsx, dsy, 40, 35);
-                    ctx.strokeStyle = '#5C2E0A';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(dsx, dsy, 40, 35);
-                    ctx.fillStyle = '#FF4444';
-                    ctx.font = '12px monospace';
-                    ctx.fillText('ВЫХОД (E)', dsx - 5, dsy - 10);
-                    if (this.healthPack) {
-                        ctx.fillStyle = '#FF4444';
-                        ctx.font = '14px monospace';
-                        ctx.fillText('💊 Аптечка (H)', sx + 10, sy + this.h - 30);
-                    }
-                    if (this.weaponSpawn) {
-                        ctx.fillStyle = '#FFD700';
-                        ctx.font = '12px monospace';
-                        ctx.fillText('Нажми F чтобы взять', sx + 10, sy + this.h - 50);
-                        ctx.fillStyle = '#888';
-                        ctx.fillRect(sx + this.w/2 - 10, sy + this.h - 60, 20, 20);
-                        ctx.fillStyle = '#FFD700';
-                        ctx.font = '12px monospace';
-                        ctx.fillText('🔫', sx + this.w/2 - 8, sy + this.h - 44);
-                    }
-                    ctx.fillStyle = '#00FFFF';
-                    ctx.font = '14px monospace';
-                    ctx.fillText('🏢 ' + this.name, sx + 10, sy + 20);
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(wx, wy, 20, 20);
                 }
             }
-        }
-
-        class NPC {
-            constructor(x, y, type = 'civilian') {
-                this.x = x; this.y = y; this.w = 30; this.h = 50;
-                this.velX = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
-                this.velY = 0;
-                this.health = 50;
-                this.dir = 1;
-                this.attacked = false;
-                this.attackTimer = 0;
-                this.grounded = false;
-                this.patrolRange = Math.floor(Math.random() * 100) + 100;
-                this.startX = x;
-                this.attackCooldown = 0;
-                this.isAttacking = false;
-                this.type = type;
-                this.insideBuilding = null;
-                const colors = ['#C83232','#32C832','#3232C8','#C8C832'];
-                this.clothes = colors[Math.floor(Math.random() * colors.length)];
-                this.skin = ['#FFC8A0','#C8A080','#FFDCC8'][Math.floor(Math.random() * 3)];
-                this.hat = ['#000','#8B4513','#888','#C83232'][Math.floor(Math.random() * 4)];
+            
+            // Дверь
+            const dsx = this.doorX - camX;
+            const dsy = this.doorY - camY;
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(dsx, dsy, 40, 35);
+            ctx.strokeStyle = '#5C2E0A';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(dsx, dsy, 40, 35);
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(dsx + 35, dsy + 20, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Название
+            ctx.fillStyle = '#FFF';
+            ctx.font = '14px monospace';
+            ctx.fillText('🏢 ' + this.name, sx, sy - 10);
+            
+            // Оружие
+            if (this.weaponSpawn) {
+                ctx.fillStyle = '#FF4444';
+                ctx.font = '12px monospace';
+                ctx.fillText('🔫 ' + this.weaponType, sx, sy - 25);
             }
-            update(platforms, player, buildings) {
-                if (this.insideBuilding) return;
-                if (!this.attacked) {
-                    this.x += this.velX;
-                    if (Math.abs(this.x - this.startX) > this.patrolRange) this.velX *= -1;
-                    this.dir = this.velX > 0 ? 1 : -1;
-                }
-                this.velY += GRAVITY;
-                this.y += this.velY;
-                this.grounded = false;
-                for (const p of platforms) {
-                    if (this.x < p.x + p.w && this.x + this.w > p.x &&
-                        this.y < p.y + p.h && this.y + this.h > p.y) {
-                        if (this.velY > 0) { this.y = p.y - this.h; this.velY = 0; this.grounded = true; }
-                    }
-                }
-                if (this.attacked) {
-                    this.attackTimer--;
-                    if (this.attackTimer <= 0) {
-                        this.attacked = false;
-                        if (Math.hypot(this.x - player.x, this.y - player.y) < 100) {
-                            this.isAttacking = true;
-                            this.attackCooldown = 40;
-                        }
-                    }
-                }
-                if (this.isAttacking && this.attackCooldown > 0) {
-                    this.attackCooldown--;
-                    if (this.attackCooldown <= 0 && 
-                        this.x < player.x + player.w && this.x + this.w > player.x &&
-                        this.y < player.y + player.h && this.y + this.h > player.y) {
-                        player.health -= 15;
-                        this.isAttacking = false;
-                    }
-                }
-                this.x = Math.max(0, Math.min(this.x, MAP_W - this.w));
+            
+            // Аптечка
+            if (this.healthPack) {
+                ctx.fillStyle = '#FF4444';
+                ctx.font = '16px monospace';
+                ctx.fillText('💊', sx + this.width - 25, sy + 20);
             }
-            draw(ctx, cx, cy) {
-                const sx = this.x - cx, sy = this.y - cy;
-                if (sx < -50 || sx > W + 50 || sy < -50 || sy > H + 50) return;
-                ctx.fillStyle = '#000066';
-                ctx.fillRect(sx + 5, sy + 40, 6, 10);
-                ctx.fillRect(sx + 19, sy + 40, 6, 10);
-                ctx.fillStyle = this.attacked ? '#FFFF00' : this.clothes;
-                ctx.fillRect(sx + 5, sy + 20, 20, 25);
-                ctx.fillStyle = this.skin;
-                if (this.isAttacking) {
-                    if (this.dir > 0) { ctx.fillRect(sx + 25, sy + 22, 10, 5); ctx.fillRect(sx + 30, sy + 17, 5, 15); }
-                    else { ctx.fillRect(sx - 5, sy + 22, 10, 5); ctx.fillRect(sx - 5, sy + 17, 5, 15); }
-                } else {
-                    ctx.fillRect(sx + 25, sy + 20, 5, 12);
-                    ctx.fillRect(sx, sy + 20, 5, 12);
-                }
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 13, 11, 0, Math.PI*2);
-                ctx.fillStyle = this.skin;
-                ctx.fill();
-                ctx.fillStyle = this.hat;
-                ctx.fillRect(sx + 8, sy - 8, 14, 8);
-                ctx.fillRect(sx + 5, sy - 2, 20, 6);
-                const ex = this.dir > 0 ? sx + 18 : sx + 12;
-                ctx.fillStyle = '#FFF';
-                ctx.beginPath();
-                ctx.arc(ex, sy + 11, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(ex + (2*this.dir), sy + 11, 2, 0, Math.PI*2);
-                ctx.fill();
-                const hw = this.w * (this.health / 50);
-                ctx.fillStyle = '#FF0000';
-                ctx.fillRect(sx, sy - 12, this.w, 4);
-                ctx.fillStyle = '#00FF00';
-                ctx.fillRect(sx, sy - 12, hw, 4);
+        } else {
+            // Интерьер
+            ctx.fillStyle = '#323246';
+            ctx.fillRect(sx, sy, this.width, this.height);
+            
+            // Пол
+            ctx.fillStyle = '#3C3C50';
+            ctx.fillRect(sx + 10, sy + this.height - 20, this.width - 20, 20);
+            
+            // Мебель
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(sx + 20, sy + 50, 80, 20);
+            ctx.fillRect(sx + 120, sy + 50, 40, 20);
+            
+            // Лифт
+            ctx.fillStyle = '#666';
+            ctx.fillRect(sx + this.width - 50, sy + 20, 30, 40);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sx + this.width - 50, sy + 20, 30, 40);
+            
+            // Дверь выхода
+            const dsx = this.doorX - camX;
+            const dsy = this.doorY - camY;
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(dsx, dsy, 40, 35);
+            ctx.strokeStyle = '#5C2E0A';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(dsx, dsy, 40, 35);
+            
+            ctx.fillStyle = '#FF4444';
+            ctx.font = '12px monospace';
+            ctx.fillText('ВЫХОД (E)', dsx - 5, dsy - 10);
+            
+            // Аптечка
+            if (this.healthPack) {
+                ctx.fillStyle = '#FF4444';
+                ctx.font = '14px monospace';
+                ctx.fillText('💊 Аптечка (H)', sx + 10, sy + this.height - 30);
             }
-        }
-
-        class Police {
-            constructor(x, y) {
-                this.x = x; this.y = y; this.w = 30; this.h = 50;
-                this.velX = 0; this.velY = 0; this.health = 80;
-                this.dir = 1; this.grounded = false;
-                this.speed = 4; this.attackCooldown = 0;
-                this.isAttacking = false; this.shootCooldown = 0;
-            }
-            update(platforms, player) {
-                if (!player.alive) return;
-                const dx = player.x - this.x, dy = player.y - this.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < 300 && player.wantedLevel > 0) {
-                    if (Math.abs(dx) > 10) {
-                        this.velX = this.speed * (dx > 0 ? 1 : -1);
-                        this.dir = dx > 0 ? 1 : -1;
-                    } else this.velX = 0;
-                    if (dist < 200 && this.shootCooldown <= 0) {
-                        this.shootCooldown = 20;
-                        const b = new Bullet(this.x + this.w/2, this.y + this.h/2,
-                            player.x + player.w/2, player.y + player.h/2, 'police');
-                        player.bullets.push(b);
-                        return;
-                    }
-                    if (dist < 50 && this.attackCooldown <= 0) {
-                        this.isAttacking = true;
-                        player.health -= 10;
-                        this.attackCooldown = 30;
-                        player.x += this.dir * 20;
-                    }
-                } else this.velX = 0;
-                if (this.shootCooldown > 0) this.shootCooldown--;
-                this.velY += GRAVITY;
-                this.y += this.velY;
-                this.grounded = false;
-                for (const p of platforms) {
-                    if (this.x < p.x + p.w && this.x + this.w > p.x &&
-                        this.y < p.y + p.h && this.y + this.h > p.y) {
-                        if (this.velY > 0) { this.y = p.y - this.h; this.velY = 0; this.grounded = true; }
-                    }
-                }
-                this.x += this.velX;
-                if (this.attackCooldown > 0) this.attackCooldown--;
-                else this.isAttacking = false;
-                this.x = Math.max(0, Math.min(this.x, MAP_W - this.w));
-            }
-            draw(ctx, cx, cy) {
-                const sx = this.x - cx, sy = this.y - cy;
-                if (sx < -50 || sx > W + 50 || sy < -50 || sy > H + 50) return;
-                ctx.fillStyle = '#000032';
-                ctx.fillRect(sx + 5, sy + 40, 6, 10);
-                ctx.fillRect(sx + 19, sy + 40, 6, 10);
-                ctx.fillStyle = '#000096';
-                ctx.fillRect(sx + 5, sy + 20, 20, 25);
+            
+            // Оружие
+            if (this.weaponSpawn) {
                 ctx.fillStyle = '#FFD700';
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 30, 5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 30, 3, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#FFC8A0';
-                if (this.isAttacking) {
-                    if (this.dir > 0) { ctx.fillRect(sx + 25, sy + 22, 10, 5); ctx.fillRect(sx + 30, sy + 17, 5, 15); }
-                    else { ctx.fillRect(sx - 5, sy + 22, 10, 5); ctx.fillRect(sx - 5, sy + 17, 5, 15); }
-                } else {
-                    ctx.fillRect(sx + 25, sy + 20, 5, 12);
-                    ctx.fillRect(sx, sy + 20, 5, 12);
-                }
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 13, 11, 0, Math.PI*2);
-                ctx.fillStyle = '#FFC8A0';
-                ctx.fill();
-                ctx.fillStyle = '#000060';
-                ctx.fillRect(sx + 5, sy - 2, 20, 6);
-                ctx.fillRect(sx + 8, sy - 10, 14, 10);
-                ctx.fillStyle = '#FFD700';
-                ctx.fillRect(sx + 8, sy - 10, 14, 2);
-                const ex = this.dir > 0 ? sx + 18 : sx + 12;
-                ctx.fillStyle = '#FFF';
-                ctx.beginPath();
-                ctx.arc(ex, sy + 11, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(ex + (2*this.dir), sy + 11, 2, 0, Math.PI*2);
-                ctx.fill();
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(sx + 8, sy + 8, 14, 4);
-                const hw = this.w * (this.health / 80);
-                ctx.fillStyle = '#FF0000';
-                ctx.fillRect(sx, sy - 12, this.w, 4);
-                ctx.fillStyle = '#00FF00';
-                ctx.fillRect(sx, sy - 12, hw, 4);
-            }
-        }
-
-        class Car {
-            constructor(x, y, color = '#FFA500') {
-                this.x = x; this.y = y; this.w = 70; this.h = 35;
-                this.color = color;
-                this.velX = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
-                this.stolen = false; this.stolenTimer = 0;
-                this.dir = 1; this.isPolice = false; this.occupied = false;
-            }
-            update() {
-                if (!this.stolen) {
-                    this.x += this.velX;
-                    this.dir = this.velX > 0 ? 1 : -1;
-                    if (this.x < 0 || this.x > MAP_W - this.w) this.velX *= -1;
-                } else {
-                    this.stolenTimer++;
-                    if (this.stolenTimer > 180) { this.stolen = false; this.stolenTimer = 0; }
-                }
-            }
-            draw(ctx, cx, cy) {
-                const sx = this.x - cx, sy = this.y - cy;
-                if (sx + this.w < -50 || sx > W + 50 || sy + this.h < -50 || sy > H + 50) return;
-                ctx.fillStyle = 'rgba(50,50,50,0.3)';
-                ctx.beginPath();
-                ctx.ellipse(sx + this.w/2, sy + this.h + 5, this.w/2 - 5, 8, 0, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = this.color;
-                ctx.fillRect(sx, sy, this.w, this.h);
-                ctx.fillStyle = this.color;
-                ctx.fillRect(sx + 15, sy - 8, this.w - 30, 15);
-                ctx.fillStyle = '#6495ED';
-                ctx.fillRect(sx + 18, sy - 5, 12, 10);
-                ctx.fillRect(sx + this.w - 30, sy - 5, 12, 10);
-                ctx.fillRect(sx + 33, sy - 5, 5, 10);
-                if (this.isPolice) {
-                    ctx.fillStyle = '#0000FF';
-                    ctx.fillRect(sx + 10, sy + 5, this.w - 20, 5);
-                    ctx.fillRect(sx + 10, sy + this.h - 10, this.w - 20, 5);
-                    const blink = Math.floor(Date.now() / 300) % 2;
-                    ctx.fillStyle = blink ? '#FF0000' : '#0000FF';
-                    ctx.fillRect(sx + this.w/2 - 10, sy - 12, 8, 6);
-                    ctx.fillStyle = blink ? '#0000FF' : '#FF0000';
-                    ctx.fillRect(sx + this.w/2 + 2, sy - 12, 8, 6);
-                }
-                ctx.fillStyle = '#FFD700';
-                if (this.dir > 0) {
-                    ctx.fillRect(sx + this.w - 5, sy + 5, 5, 8);
-                    ctx.fillRect(sx + this.w - 5, sy + this.h - 13, 5, 8);
-                } else {
-                    ctx.fillRect(sx, sy + 5, 5, 8);
-                    ctx.fillRect(sx, sy + this.h - 13, 5, 8);
-                }
-                ctx.fillStyle = '#FF0000';
-                if (this.dir > 0) {
-                    ctx.fillRect(sx, sy + 3, 4, 7);
-                    ctx.fillRect(sx, sy + this.h - 10, 4, 7);
-                } else {
-                    ctx.fillRect(sx + this.w - 4, sy + 3, 4, 7);
-                    ctx.fillRect(sx + this.w - 4, sy + this.h - 10, 4, 7);
-                }
-                ctx.fillStyle = '#141414';
-                ctx.beginPath();
-                ctx.arc(sx + 12, sy + this.h + 2, 8, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + this.w - 12, sy + this.h + 2, 8, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + 12, sy - 2, 8, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + this.w - 12, sy - 2, 8, 0, Math.PI*2);
-                ctx.fill();
+                ctx.font = '12px monospace';
+                ctx.fillText('Нажми F чтобы взять', sx + 10, sy + this.height - 50);
+                // Рисуем оружие на полу
                 ctx.fillStyle = '#888';
-                ctx.beginPath();
-                ctx.arc(sx + 12, sy + this.h + 2, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + this.w - 12, sy + this.h + 2, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + 12, sy - 2, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(sx + this.w - 12, sy - 2, 4, 0, Math.PI*2);
-                ctx.fill();
-                if (!this.occupied && !this.stolen) {
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = '12px monospace';
-                    ctx.fillText('E - СЕСТЬ', sx + this.w/2 - 30, sy - 15);
-                }
-                if (this.stolen) {
-                    const blink = Math.floor(Date.now() / 500) % 2;
-                    if (blink) {
-                        ctx.fillStyle = '#FF0000';
-                        ctx.fillRect(sx + this.w/2 - 3, sy - 12, 6, 6);
-                        ctx.fillStyle = '#0000FF';
-                        ctx.fillRect(sx + this.w/2 - 3, sy - 12, 6, 6);
-                    }
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = '20px monospace';
-                    ctx.fillText('★', sx + this.w/2 - 10, sy - 25);
-                    ctx.fillStyle = '#FF0000';
-                    ctx.font = '12px monospace';
-                    ctx.fillText('УГНАНА!', sx + this.w/2 - 25, sy - 38);
+                ctx.fillRect(sx + this.width/2 - 10, sy + this.height - 60, 20, 20);
+                ctx.fillStyle = '#FFD700';
+                ctx.font = '12px monospace';
+                ctx.fillText('🔫', sx + this.width/2 - 8, sy + this.height - 44);
+            }
+            
+            // Имя здания
+            ctx.fillStyle = '#00FFFF';
+            ctx.font = '14px monospace';
+            ctx.fillText('🏢 ' + this.name, sx + 10, sy + 20);
+        }
+    }
+}
+
+class NPC {
+    constructor(x, y, type = 'civilian') {
+        this.x = x;
+        this.y = y;
+        this.width = 30;
+        this.height = 50;
+        this.velX = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
+        this.velY = 0;
+        this.health = 50;
+        this.direction = 1;
+        this.attacked = false;
+        this.attackTimer = 0;
+        this.isGrounded = false;
+        this.patrolRange = Math.floor(Math.random() * 100) + 100;
+        this.startX = x;
+        this.attackCooldown = 0;
+        this.isAttacking = false;
+        this.type = type;
+        this.insideBuilding = null;
+        
+        const colors = ['#C83232', '#32C832', '#3232C8', '#C8C832'];
+        this.clothesColor = colors[Math.floor(Math.random() * colors.length)];
+        this.skinTone = ['#FFC8A0', '#C8A080', '#FFDCC8'][Math.floor(Math.random() * 3)];
+        this.hatColor = ['#000', '#8B4513', '#888', '#C83232'][Math.floor(Math.random() * 4)];
+    }
+    
+    update(platforms, player, buildings) {
+        if (this.insideBuilding) return;
+        
+        if (!this.attacked) {
+            this.x += this.velX;
+            if (Math.abs(this.x - this.startX) > this.patrolRange) {
+                this.velX *= -1;
+            }
+            this.direction = this.velX > 0 ? 1 : -1;
+        }
+        
+        this.velY += GRAVITY;
+        this.y += this.velY;
+        this.isGrounded = false;
+        
+        for (const plat of platforms) {
+            if (this.x < plat.x + plat.width && this.x + this.width > plat.x &&
+                this.y < plat.y + plat.height && this.y + this.height > plat.y) {
+                if (this.velY > 0) {
+                    this.y = plat.y - this.height;
+                    this.velY = 0;
+                    this.isGrounded = true;
                 }
             }
         }
-
-        class Player {
-            constructor(x, y, color, name) {
-                this.x = x; this.y = y; this.w = 30; this.h = 50;
-                this.velX = 0; this.velY = 0;
-                this.speed = 5; this.runSpeed = 8;
-                this.health = 100; this.maxHealth = 100;
-                this.money = 0;
-                this.dir = 1;
-                this.attacking = false;
-                this.attackTimer = 0;
-                this.attackCooldown = 0;
-                this.grounded = false;
-                this.walkFrame = 0;
-                this.walkTimer = 0;
-                this.wantedLevel = 0;
-                this.wantedTimer = 0;
-                this.kills = 0;
-                this.policeKills = 0;
-                this.color = color;
-                this.name = name;
-                this.hasGun = false;
-                this.weaponType = 'pistol';
-                this.weaponAmmo = 30;
-                this.bullets = [];
-                this.shootCooldown = 0;
-                this.aiming = false;
-                this.insideBuilding = null;
-                this.inCar = false;
-                this.car = null;
-                this.alive = true;
-                this.invincibleTimer = 0;
-                this.lives = 3;
-                this.homeBuilding = null;
-                this.messages = ['Добро пожаловать в GTA!', 'Заходи в здания за оружием!', 'Убивай врагов и зарабатывай деньги!'];
-                this.msgIndex = 0;
-            }
-
-            update(platforms, npcs, cars, police, buildings) {
-                if (!this.alive) return;
-                if (this.invincibleTimer > 0) this.invincibleTimer--;
-                if (this.inCar && this.car) {
-                    this.x = this.car.x + this.car.w/2 - this.w/2;
-                    this.y = this.car.y - this.h + 5;
-                    this.velX = this.car.velX;
-                    return;
-                }
-                this.x += this.velX;
-                for (const p of platforms) {
-                    if (this.x < p.x + p.w && this.x + this.w > p.x &&
-                        this.y < p.y + p.h && this.y + this.h > p.y) {
-                        if (this.velX > 0) this.x = p.x - this.w;
-                        else if (this.velX < 0) this.x = p.x + p.w;
-                    }
-                }
-                this.velY += GRAVITY;
-                this.y += this.velY;
-                this.grounded = false;
-                for (const p of platforms) {
-                    if (this.x < p.x + p.w && this.x + this.w > p.x &&
-                        this.y < p.y + p.h && this.y + this.h > p.y) {
-                        if (this.velY > 0) { this.y = p.y - this.h; this.velY = 0; this.grounded = true; }
-                        else if (this.velY < 0) { this.y = p.y + p.h; this.velY = 0; }
-                    }
-                }
-                if (this.insideBuilding) { this.velY = 0; return; }
-                for (const c of cars) {
-                    if (c && this.x < c.x + c.w && this.x + this.w > c.x &&
-                        this.y < c.y + c.h && this.y + this.h > c.y &&
-                        !c.stolen && !this.inCar) {
-                        this.x -= this.velX * 2;
-                        this.y -= this.velY * 2;
-                    }
-                }
-                for (const cop of police) {
-                    if (this.x < cop.x + cop.w && this.x + this.w > cop.x &&
-                        this.y < cop.y + cop.h && this.y + this.h > cop.y &&
-                        this.wantedLevel > 0 && this.invincibleTimer === 0) {
-                        this.health -= 15;
-                        this.invincibleTimer = 30;
-                        this.x += (Math.random() > 0.5 ? 1 : -1) * 40;
-                        this.y -= 20;
-                        if (this.health <= 0) this.die();
-                    }
-                }
-                for (const b of this.bullets) b.update();
-                this.bullets = this.bullets.filter(b => b.alive);
-                for (const b of this.bullets) {
-                    for (const npc of npcs) {
-                        if (b.x < npc.x + npc.w && b.x + b.radius*2 > npc.x &&
-                            b.y < npc.y + npc.h && b.y + b.radius*2 > npc.y) {
-                            npc.health -= b.damage;
-                            b.alive = false;
-                            if (npc.health <= 0) {
-                                const idx = npcs.indexOf(npc);
-                                if (idx > -1) npcs.splice(idx, 1);
-                                this.money += Math.floor(Math.random() * 100) + 50;
-                                this.kills++;
-                                this.wantedLevel = Math.min(5, this.wantedLevel + 2);
-                                this.messages.push('🔫 Убит NPC! +$' + (Math.floor(Math.random() * 100) + 50));
-                            }
-                            break;
-                        }
-                    }
-                    for (const cop of police) {
-                        if (b.x < cop.x + cop.w && b.x + b.radius*2 > cop.x &&
-                            b.y < cop.y + cop.h && b.y + b.radius*2 > cop.y) {
-                            cop.health -= b.damage;
-                            b.alive = false;
-                            if (cop.health <= 0) {
-                                const idx = police.indexOf(cop);
-                                if (idx > -1) police.splice(idx, 1);
-                                this.money += Math.floor(Math.random() * 100) + 100;
-                                this.policeKills++;
-                                this.kills++;
-                                this.wantedLevel = Math.min(5, this.wantedLevel + 3);
-                                this.messages.push('🚔 УБИТ ПОЛИЦЕЙСКИЙ! +$' + (Math.floor(Math.random() * 100) + 100));
-                                if (police.length < 6) {
-                                    police.push(new Police(
-                                        Math.floor(Math.random() * (MAP_W - 200)) + 100,
-                                        Math.floor(Math.random() * (MAP_H - 300)) + 200
-                                    ));
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                this.bullets = this.bullets.filter(b => b.alive);
-                if (this.attacking) { this.attackTimer--; if (this.attackTimer <= 0) this.attacking = false; }
-                if (this.attackCooldown > 0) this.attackCooldown--;
-                if (this.shootCooldown > 0) this.shootCooldown--;
-                if (this.wantedLevel > 0) { this.wantedTimer++; if (this.wantedTimer > 300) { this.wantedLevel--; this.wantedTimer = 0; } }
-                if (Math.abs(this.velX) > 0 && this.grounded) {
-                    this.walkTimer++;
-                    if (this.walkTimer > 10) { this.walkTimer = 0; this.walkFrame = (this.walkFrame + 1) % 4; }
-                } else this.walkFrame = 0;
-                this.x = Math.max(0, Math.min(this.x, MAP_W - this.w));
-                if (this.y > MAP_H) this.health = 0;
-            }
-
-            die() {
-                this.lives--;
-                if (this.lives <= 0) { this.alive = false; return; }
-                this.health = this.maxHealth;
-                if (this.homeBuilding) {
-                    this.x = this.homeBuilding.x + this.homeBuilding.w/2;
-                    this.y = this.homeBuilding.y + 10;
-                } else { this.x = W/2; this.y = 300; }
-                this.money = Math.max(0, this.money - 200);
-                this.wantedLevel = Math.max(0, this.wantedLevel - 2);
-                this.invincibleTimer = 60;
-            }
-
-            shoot(tx, ty) {
-                if (!this.hasGun || this.shootCooldown > 0 || !this.alive || this.weaponAmmo <= 0) {
-                    if (this.hasGun && this.weaponAmmo <= 0) this.messages.push('❌ Нет патронов!');
-                    return false;
-                }
-                let dmg = 25, spd = 12;
-                if (this.weaponType === 'shotgun') {
-                    dmg = 40; spd = 8;
-                    for (let i = 0; i < 5; i++) {
-                        const b = new Bullet(this.x + this.w/2, this.y + this.h/2,
-                            tx + (Math.random() - 0.5) * 40, ty + (Math.random() - 0.5) * 40, 'player');
-                        b.damage = dmg; b.speed = spd;
-                        this.bullets.push(b);
-                    }
-                    this.weaponAmmo--; this.shootCooldown = 20;
-                    return true;
-                } else if (this.weaponType === 'rifle') { dmg = 50; spd = 15; }
-                else if (this.weaponType === 'uzi') { dmg = 15; spd = 10; this.shootCooldown = 3; }
-                const b = new Bullet(this.x + this.w/2, this.y + this.h/2, tx, ty, 'player');
-                b.damage = dmg; b.speed = spd;
-                this.bullets.push(b);
-                this.weaponAmmo--;
-                this.shootCooldown = this.weaponType === 'uzi' ? 3 : 10;
-                return true;
-            }
-
-            attack(npcs, police, cars) {
-                if (this.attackCooldown > 0 || this.attacking || !this.alive) return;
-                this.attacking = true;
-                this.attackTimer = 15;
-                this.attackCooldown = 20;
-                const ax = this.x + (this.w * this.dir) - 10, ay = this.y - 10, aw = 40, ah = 60;
-                for (const npc of npcs) {
-                    if (ax < npc.x + npc.w && ax + aw > npc.x &&
-                        ay < npc.y + npc.h && ay + ah > npc.y) {
-                        npc.health -= 25;
-                        npc.attacked = true;
-                        npc.attackTimer = 30;
-                        npc.x += this.dir * 20;
-                        if (npc.health <= 0) {
-                            const idx = npcs.indexOf(npc);
-                            if (idx > -1) npcs.splice(idx, 1);
-                            this.money += Math.floor(Math.random() * 100) + 50;
-                            this.kills++;
-                            this.wantedLevel = Math.min(5, this.wantedLevel + 2);
-                            this.messages.push('Убит NPC! +$' + (Math.floor(Math.random() * 100) + 50));
-                        } else this.wantedLevel = Math.min(5, this.wantedLevel + 1);
-                    }
-                }
-                for (const cop of police) {
-                    if (ax < cop.x + cop.w && ax + aw > cop.x &&
-                        ay < cop.y + cop.h && ay + ah > cop.y) {
-                        cop.health -= 30;
-                        cop.x += this.dir * 25;
-                        if (cop.health <= 0) {
-                            const idx = police.indexOf(cop);
-                            if (idx > -1) police.splice(idx, 1);
-                            this.money += Math.floor(Math.random() * 100) + 100;
-                            this.policeKills++;
-                            this.kills++;
-                            this.wantedLevel = Math.min(5, this.wantedLevel + 3);
-                            this.messages.push('🚔 УБИТ ПОЛИЦЕЙСКИЙ! +$' + (Math.floor(Math.random() * 100) + 100));
-                            if (police.length < 6) {
-                                police.push(new Police(
-                                    Math.floor(Math.random() * (MAP_W - 200)) + 100,
-                                    Math.floor(Math.random() * (MAP_H - 300)) + 200
-                                ));
-                            }
-                        } else this.wantedLevel = Math.min(5, this.wantedLevel + 2);
-                    }
-                }
-                for (const c of cars) {
-                    if (c && ax < c.x + c.w && ax + aw > c.x &&
-                        ay < c.y + c.h && ay + ah > c.y && !c.stolen) {
-                        if (this.money >= 100) {
-                            this.money -= 100;
-                            c.stolen = true;
-                            c.color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-                            this.wantedLevel = Math.min(5, this.wantedLevel + 2);
-                            this.messages.push('🚗 Угнал машину! -$100');
-                        }
-                    }
+        
+        if (this.attacked) {
+            this.attackTimer--;
+            if (this.attackTimer <= 0) {
+                this.attacked = false;
+                if (Math.hypot(this.x - player.x, this.y - player.y) < 100) {
+                    this.isAttacking = true;
+                    this.attackCooldown = 40;
                 }
             }
+        }
+        
+        if (this.isAttacking && this.attackCooldown > 0) {
+            this.attackCooldown--;
+            if (this.attackCooldown <= 0 && 
+                this.x < player.x + player.width && this.x + this.width > player.x &&
+                this.y < player.y + player.height && this.y + this.height > player.y) {
+                player.health -= 15;
+                this.isAttacking = false;
+            }
+        }
+        
+        this.x = Math.max(0, Math.min(this.x, MAP_WIDTH - this.width));
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx < -50 || sx > WIDTH + 50 || sy < -50 || sy > HEIGHT + 50) return;
+        
+        // Ноги
+        ctx.fillStyle = '#000066';
+        ctx.fillRect(sx + 5, sy + 40, 6, 10);
+        ctx.fillRect(sx + 19, sy + 40, 6, 10);
+        
+        // Тело
+        ctx.fillStyle = this.attacked ? '#FFFF00' : this.clothesColor;
+        ctx.fillRect(sx + 5, sy + 20, 20, 25);
+        
+        // Руки
+        ctx.fillStyle = this.skinTone;
+        if (this.isAttacking) {
+            if (this.direction > 0) {
+                ctx.fillRect(sx + 25, sy + 22, 10, 5);
+                ctx.fillRect(sx + 30, sy + 17, 5, 15);
+            } else {
+                ctx.fillRect(sx - 5, sy + 22, 10, 5);
+                ctx.fillRect(sx - 5, sy + 17, 5, 15);
+            }
+        } else {
+            ctx.fillRect(sx + 25, sy + 20, 5, 12);
+            ctx.fillRect(sx, sy + 20, 5, 12);
+        }
+        
+        // Голова
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 13, 11, 0, Math.PI * 2);
+        ctx.fillStyle = this.skinTone;
+        ctx.fill();
+        
+        // Шляпа
+        ctx.fillStyle = this.hatColor;
+        ctx.fillRect(sx + 8, sy - 8, 14, 8);
+        ctx.fillRect(sx + 5, sy - 2, 20, 6);
+        
+        // Глаза
+        const eyeX = this.direction > 0 ? sx + 18 : sx + 12;
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(eyeX, sy + 11, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(eyeX + (2 * this.direction), sy + 11, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Здоровье
+        const healthWidth = this.width * (this.health / 50);
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(sx, sy - 12, this.width, 4);
+        ctx.fillStyle = '#00FF00';
+        ctx.fillRect(sx, sy - 12, healthWidth, 4);
+    }
+}
 
-            draw(ctx, cx, cy) {
-                if (!this.alive) return;
-                const sx = this.x - cx, sy = this.y - cy;
-                if (sx < -50 || sx > W + 50 || sy < -50 || sy > H + 50) return;
-                if (this.invincibleTimer > 0 && Math.floor(this.invincibleTimer / 5) % 2 === 0) return;
-                ctx.fillStyle = 'rgba(50,50,50,0.3)';
-                ctx.beginPath();
-                ctx.ellipse(sx + 15, sy + 50, 15, 5, 0, 0, Math.PI*2);
-                ctx.fill();
-                let lo = 0;
-                if (this.walkFrame === 1) lo = 3;
-                else if (this.walkFrame === 2) lo = -3;
-                ctx.fillStyle = '#000096';
-                ctx.fillRect(sx + 5, sy + 35 + lo, 6, 15);
-                ctx.fillRect(sx + 19, sy + 35 - lo, 6, 15);
-                ctx.fillStyle = this.color;
-                ctx.fillRect(sx + 5, sy + 15, 20, 25);
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(sx + 5, sy + 30, 20, 5);
-                ctx.fillStyle = '#FFC8A0';
-                if (this.hasGun && this.aiming) {
-                    ctx.fillRect(sx + 25, sy + 15, 10, 5);
-                    ctx.fillRect(sx + 30, sy + 10, 5, 15);
-                    ctx.fillStyle = '#888';
-                    ctx.fillRect(sx + 32, sy + 8, 12, 6);
-                    ctx.fillStyle = '#444';
-                    ctx.fillRect(sx + 44, sy + 9, 4, 4);
-                } else if (this.attacking) {
-                    if (this.dir > 0) { ctx.fillRect(sx + 25, sy + 15, 10, 5); ctx.fillRect(sx + 30, sy + 10, 5, 15); }
-                    else { ctx.fillRect(sx - 5, sy + 15, 10, 5); ctx.fillRect(sx - 5, sy + 10, 5, 15); }
-                } else {
-                    ctx.fillRect(sx + 25, sy + 15, 5, 15);
-                    ctx.fillRect(sx, sy + 15, 5, 15);
+class Police {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 30;
+        this.height = 50;
+        this.velX = 0;
+        this.velY = 0;
+        this.health = 80;
+        this.direction = 1;
+        this.isGrounded = false;
+        this.speed = 4;
+        this.attackCooldown = 0;
+        this.isAttacking = false;
+        this.shootCooldown = 0;
+    }
+    
+    update(platforms, player) {
+        if (!player.alive) return;
+        
+        const dx = player.x - this.x;
+        const dy = player.y - this.y;
+        const dist = Math.hypot(dx, dy);
+        
+        if (dist < 300 && player.wantedLevel > 0) {
+            if (Math.abs(dx) > 10) {
+                this.velX = this.speed * (dx > 0 ? 1 : -1);
+                this.direction = dx > 0 ? 1 : -1;
+            } else {
+                this.velX = 0;
+            }
+            
+            if (dist < 200 && this.shootCooldown <= 0) {
+                this.shootCooldown = 20;
+                const bullet = new Bullet(
+                    this.x + this.width/2,
+                    this.y + this.height/2,
+                    player.x + player.width/2,
+                    player.y + player.height/2,
+                    'police'
+                );
+                player.bullets.push(bullet);
+                return;
+            }
+            
+            if (dist < 50 && this.attackCooldown <= 0) {
+                this.isAttacking = true;
+                player.health -= 10;
+                this.attackCooldown = 30;
+                player.x += this.direction * 20;
+            }
+        } else {
+            this.velX = 0;
+        }
+        
+        if (this.shootCooldown > 0) this.shootCooldown--;
+        
+        this.velY += GRAVITY;
+        this.y += this.velY;
+        this.isGrounded = false;
+        
+        for (const plat of platforms) {
+            if (this.x < plat.x + plat.width && this.x + this.width > plat.x &&
+                this.y < plat.y + plat.height && this.y + this.height > plat.y) {
+                if (this.velY > 0) {
+                    this.y = plat.y - this.height;
+                    this.velY = 0;
+                    this.isGrounded = true;
                 }
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 10, 10, 0, Math.PI*2);
-                ctx.fillStyle = '#FFC8A0';
-                ctx.fill();
-                ctx.strokeStyle = this.dir > 0 ? '#321F0A' : '#0A1F32';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(sx + 15, sy + 6, 10, Math.PI, 0);
-                ctx.stroke();
-                const ex = this.dir > 0 ? sx + 18 : sx + 12;
-                ctx.fillStyle = '#FFF';
-                ctx.beginPath();
-                ctx.arc(ex, sy + 8, 4, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(ex + (2*this.dir), sy + 8, 2, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#FFF';
-                ctx.font = '12px monospace';
-                ctx.fillText(this.name, sx, sy - 25);
+            }
+        }
+        
+        this.x += this.velX;
+        
+        if (this.attackCooldown > 0) {
+            this.attackCooldown--;
+        } else {
+            this.isAttacking = false;
+        }
+        
+        this.x = Math.max(0, Math.min(this.x, MAP_WIDTH - this.width));
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx < -50 || sx > WIDTH + 50 || sy < -50 || sy > HEIGHT + 50) return;
+        
+        ctx.fillStyle = '#000032';
+        ctx.fillRect(sx + 5, sy + 40, 6, 10);
+        ctx.fillRect(sx + 19, sy + 40, 6, 10);
+        
+        ctx.fillStyle = '#000096';
+        ctx.fillRect(sx + 5, sy + 20, 20, 25);
+        
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 30, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 30, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#FFC8A0';
+        if (this.isAttacking) {
+            if (this.direction > 0) {
+                ctx.fillRect(sx + 25, sy + 22, 10, 5);
+                ctx.fillRect(sx + 30, sy + 17, 5, 15);
+            } else {
+                ctx.fillRect(sx - 5, sy + 22, 10, 5);
+                ctx.fillRect(sx - 5, sy + 17, 5, 15);
+            }
+        } else {
+            ctx.fillRect(sx + 25, sy + 20, 5, 12);
+            ctx.fillRect(sx, sy + 20, 5, 12);
+        }
+        
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 13, 11, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFC8A0';
+        ctx.fill();
+        
+        ctx.fillStyle = '#000060';
+        ctx.fillRect(sx + 5, sy - 2, 20, 6);
+        ctx.fillRect(sx + 8, sy - 10, 14, 10);
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(sx + 8, sy - 10, 14, 2);
+        
+        const eyeX = this.direction > 0 ? sx + 18 : sx + 12;
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(eyeX, sy + 11, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(eyeX + (2 * this.direction), sy + 11, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(sx + 8, sy + 8, 14, 4);
+        
+        const healthWidth = this.width * (this.health / 80);
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(sx, sy - 12, this.width, 4);
+        ctx.fillStyle = '#00FF00';
+        ctx.fillRect(sx, sy - 12, healthWidth, 4);
+    }
+}
+
+class Car {
+    constructor(x, y, color = '#FFA500') {
+        this.x = x;
+        this.y = y;
+        this.width = 70;
+        this.height = 35;
+        this.color = color;
+        this.velX = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
+        this.stolen = false;
+        this.stolenTimer = 0;
+        this.direction = 1;
+        this.isPolice = false;
+        this.occupied = false;
+    }
+    
+    update() {
+        if (!this.stolen) {
+            this.x += this.velX;
+            this.direction = this.velX > 0 ? 1 : -1;
+            if (this.x < 0 || this.x > MAP_WIDTH - this.width) {
+                this.velX *= -1;
+            }
+        } else {
+            this.stolenTimer++;
+            if (this.stolenTimer > 180) {
+                this.stolen = false;
+                this.stolenTimer = 0;
+            }
+        }
+    }
+    
+    draw(ctx, camX, camY) {
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx + this.width < -50 || sx > WIDTH + 50 || sy + this.height < -50 || sy > HEIGHT + 50) return;
+        
+        // Тень
+        ctx.fillStyle = 'rgba(50,50,50,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(sx + this.width/2, sy + this.height + 5, this.width/2 - 5, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Кузов
+        ctx.fillStyle = this.color;
+        ctx.fillRect(sx, sy, this.width, this.height);
+        
+        // Крыша
+        const rColor = this.color.split(',').map(c => Math.max(0, parseInt(c) - 40));
+        ctx.fillStyle = this.color;
+        ctx.fillRect(sx + 15, sy - 8, this.width - 30, 15);
+        
+        // Окна
+        ctx.fillStyle = '#6495ED';
+        ctx.fillRect(sx + 18, sy - 5, 12, 10);
+        ctx.fillRect(sx + this.width - 30, sy - 5, 12, 10);
+        ctx.fillRect(sx + 33, sy - 5, 5, 10);
+        
+        // Полицейская машина
+        if (this.isPolice) {
+            ctx.fillStyle = '#0000FF';
+            ctx.fillRect(sx + 10, sy + 5, this.width - 20, 5);
+            ctx.fillRect(sx + 10, sy + this.height - 10, this.width - 20, 5);
+            
+            const blink = Math.floor(Date.now() / 300) % 2;
+            ctx.fillStyle = blink ? '#FF0000' : '#0000FF';
+            ctx.fillRect(sx + this.width/2 - 10, sy - 12, 8, 6);
+            ctx.fillStyle = blink ? '#0000FF' : '#FF0000';
+            ctx.fillRect(sx + this.width/2 + 2, sy - 12, 8, 6);
+        }
+        
+        // Фары
+        ctx.fillStyle = '#FFD700';
+        if (this.direction > 0) {
+            ctx.fillRect(sx + this.width - 5, sy + 5, 5, 8);
+            ctx.fillRect(sx + this.width - 5, sy + this.height - 13, 5, 8);
+        } else {
+            ctx.fillRect(sx, sy + 5, 5, 8);
+            ctx.fillRect(sx, sy + this.height - 13, 5, 8);
+        }
+        
+        // Задние фонари
+        ctx.fillStyle = '#FF0000';
+        if (this.direction > 0) {
+            ctx.fillRect(sx, sy + 3, 4, 7);
+            ctx.fillRect(sx, sy + this.height - 10, 4, 7);
+        } else {
+            ctx.fillRect(sx + this.width - 4, sy + 3, 4, 7);
+            ctx.fillRect(sx + this.width - 4, sy + this.height - 10, 4, 7);
+        }
+        
+        // Колеса
+        ctx.fillStyle = '#141414';
+        ctx.beginPath();
+        ctx.arc(sx + 12, sy + this.height + 2, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + this.width - 12, sy + this.height + 2, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + 12, sy - 2, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + this.width - 12, sy - 2, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Диски
+        ctx.fillStyle = '#888';
+        ctx.beginPath();
+        ctx.arc(sx + 12, sy + this.height + 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + this.width - 12, sy + this.height + 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + 12, sy - 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(sx + this.width - 12, sy - 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Надпись "E - СЕСТЬ"
+        if (!this.occupied && !this.stolen) {
+            ctx.fillStyle = '#FFD700';
+            ctx.font = '12px monospace';
+            ctx.fillText('E - СЕСТЬ', sx + this.width/2 - 30, sy - 15);
+        }
+        
+        if (this.stolen) {
+            const blink = Math.floor(Date.now() / 500) % 2;
+            if (blink) {
                 ctx.fillStyle = '#FF0000';
-                ctx.font = '12px monospace';
-                ctx.fillText('❤️x' + this.lives, sx, sy - 40);
-                if (this.hasGun) {
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = '12px monospace';
-                    ctx.fillText('🔫 ' + this.weaponType + ': ' + this.weaponAmmo, sx, sy - 55);
+                ctx.fillRect(sx + this.width/2 - 3, sy - 12, 6, 6);
+                ctx.fillStyle = '#0000FF';
+                ctx.fillRect(sx + this.width/2 - 3, sy - 12, 6, 6);
+            }
+            
+            // Звезда
+            ctx.fillStyle = '#FFD700';
+            ctx.font = '20px monospace';
+            ctx.fillText('★', sx + this.width/2 - 10, sy - 25);
+            ctx.fillStyle = '#FF0000';
+            ctx.font = '12px monospace';
+            ctx.fillText('УГНАНА!', sx + this.width/2 - 25, sy - 38);
+        }
+    }
+}
+
+class Player {
+    constructor(x, y, color, name) {
+        this.x = x;
+        this.y = y;
+        this.width = 30;
+        this.height = 50;
+        this.velX = 0;
+        this.velY = 0;
+        this.speed = 5;
+        this.runSpeed = 8;
+        this.health = 100;
+        this.maxHealth = 100;
+        this.money = 0;
+        this.direction = 1;
+        this.attacking = false;
+        this.attackTimer = 0;
+        this.attackCooldown = 0;
+        this.isGrounded = false;
+        this.walkFrame = 0;
+        this.walkTimer = 0;
+        this.wantedLevel = 0;
+        this.wantedTimer = 0;
+        this.kills = 0;
+        this.policeKills = 0;
+        this.color = color;
+        this.name = name;
+        this.hasGun = false;
+        this.weaponType = 'pistol';
+        this.weaponAmmo = 30;
+        this.bullets = [];
+        this.shootCooldown = 0;
+        this.aiming = false;
+        this.insideBuilding = null;
+        this.inCar = false;
+        this.car = null;
+        this.alive = true;
+        this.invincibleTimer = 0;
+        this.lives = 3;
+        this.homeBuilding = null;
+        this.messages = ['Добро пожаловать в GTA!', 'Заходи в здания за оружием!', 'Убивай врагов и зарабатывай деньги!'];
+        this.messageIndex = 0;
+    }
+    
+    update(platforms, npcs, cars, police, buildings) {
+        if (!this.alive) return;
+        if (this.invincibleTimer > 0) this.invincibleTimer--;
+        
+        if (this.inCar && this.car) {
+            this.x = this.car.x + this.car.width/2 - this.width/2;
+            this.y = this.car.y - this.height + 5;
+            this.velX = this.car.velX;
+            return;
+        }
+        
+        this.x += this.velX;
+        
+        for (const plat of platforms) {
+            if (this.x < plat.x + plat.width && this.x + this.width > plat.x &&
+                this.y < plat.y + plat.height && this.y + this.height > plat.y) {
+                if (this.velX > 0) {
+                    this.x = plat.x - this.width;
+                } else if (this.velX < 0) {
+                    this.x = plat.x + plat.width;
                 }
             }
         }
-
-        // ========================================================================
-        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
-        // ========================================================================
-
-        const p1 = new Player(200, 500, '#32C832', 'Герой');
-        const p2 = new Player(500, 500, '#C83232', 'Боец');
-        p2.hasGun = true;
-        p2.weaponType = 'uzi';
-        p2.weaponAmmo = 40;
-        let currentPlayer = p1;
-        const players = [p1, p2];
-
-        const buildings = [];
-        const bNames = ['Жилой Комплекс', 'Бизнес Центр', 'Торговый Центр', 'Офисное Здание', 'Апартаменты', 'Гостиница'];
-
-        const h1 = new Building(150, GROUND_Y, 80, 100, '#B4B4DC', 'Дом Героя');
-        h1.healthPack = true; h1.maxNpcs = 0; h1.weaponSpawn = true; h1.weaponType = 'pistol';
-        buildings.push(h1);
-        const h2 = new Building(350, GROUND_Y, 80, 100, '#DCB4B4', 'Дом Бойца');
-        h2.healthPack = true; h2.maxNpcs = 0; h2.weaponSpawn = true; h2.weaponType = 'shotgun';
-        buildings.push(h2);
-        p1.homeBuilding = h1;
-        p2.homeBuilding = h2;
-
-        for (let i = 0; i < bNames.length; i++) {
-            const x = Math.floor(Math.random() * (MAP_W - 400)) + 500;
-            const w = Math.floor(Math.random() * 80) + 120;
-            const h = Math.floor(Math.random() * 60) + 120;
-            const colors = ['#B4B4DC','#DCB4B4','#B4DCB4','#DCDCB4'];
-            const b = new Building(x, GROUND_Y, w, h, colors[i % colors.length], bNames[i]);
-            b.maxNpcs = Math.floor(Math.random() * 4) + 4;
-            b.weaponSpawn = Math.random() > 0.5;
-            b.weaponType = b.weaponSpawn ? ['pistol','shotgun','rifle','uzi'][Math.floor(Math.random()*4)] : null;
-            buildings.push(b);
+        
+        this.velY += GRAVITY;
+        this.y += this.velY;
+        this.isGrounded = false;
+        
+        for (const plat of platforms) {
+            if (this.x < plat.x + plat.width && this.x + this.width > plat.x &&
+                this.y < plat.y + plat.height && this.y + this.height > plat.y) {
+                if (this.velY > 0) {
+                    this.y = plat.y - this.height;
+                    this.velY = 0;
+                    this.isGrounded = true;
+                } else if (this.velY < 0) {
+                    this.y = plat.y + plat.height;
+                    this.velY = 0;
+                }
+            }
         }
-
-        const npcs = [];
-        for (let i = 0; i < 25; i++) {
-            const x = Math.floor(Math.random() * (MAP_W - 200)) + 100;
-            const y = Math.floor(Math.random() * (MAP_H - 400)) + 200;
-            const types = ['civilian','business','gangster','worker'];
-            npcs.push(new NPC(x, y, types[Math.floor(Math.random() * types.length)]));
+        
+        if (this.insideBuilding) {
+            this.velY = 0;
+            return;
         }
-
-        const platforms = [
-            new Platform(0, MAP_H - 40, MAP_W, 40, '#323232')
-        ];
-        for (let i = 0; i < 10; i++) {
-            const x = Math.floor(Math.random() * (MAP_W - 300)) + 200;
-            const y = Math.floor(Math.random() * (MAP_H - 400)) + 200;
-            platforms.push(new Platform(x, y, Math.floor(Math.random() * 70) + 80, 20, '#649564'));
+        
+        for (const car of cars) {
+            if (car && this.x < car.x + car.width && this.x + this.width > car.x &&
+                this.y < car.y + car.height && this.y + this.height > car.y &&
+                !car.stolen && !this.inCar) {
+                this.x -= this.velX * 2;
+                this.y -= this.velY * 2;
+            }
         }
-
-        const police = [
-            new Police(400, 400), new Police(900, 400),
-            new Police(1500, 400), new Police(2000, 400)
-        ];
-
-        const cars = [];
-        const carColors = ['#FFA500','#FFC800','#0096FF','#C800C8'];
-        for (let i = 0; i < 10; i++) {
-            const x = Math.floor(Math.random() * (MAP_W - 200)) + 100;
-            cars.push(new Car(x, MAP_H - 70, carColors[i % carColors.length]));
+        
+        for (const cop of police) {
+            if (this.x < cop.x + cop.width && this.x + this.width > cop.x &&
+                this.y < cop.y + cop.height && this.y + this.height > cop.y &&
+                this.wantedLevel > 0 && this.invincibleTimer === 0) {
+                this.health -= 15;
+                this.invincibleTimer = 30;
+                this.x += (Math.random() > 0.5 ? 1 : -1) * 40;
+                this.y -= 20;
+                if (this.health <= 0) this.die();
+            }
         }
-        const pc = new Car(50, MAP_H - 70, '#000096');
-        pc.isPolice = true;
-        cars.push(pc);
+        
+        for (const bullet of this.bullets) {
+            bullet.update();
+        }
+        this.bullets = this.bullets.filter(b => b.alive);
+        
+        for (const bullet of this.bullets) {
+            for (const npc of npcs) {
+                if (bullet.x < npc.x + npc.width && bullet.x + bullet.radius * 2 > npc.x &&
+                    bullet.y < npc.y + npc.height && bullet.y + bullet.radius * 2 > npc.y) {
+                    npc.health -= bullet.damage;
+                    bullet.alive = false;
+                    if (npc.health <= 0) {
+                        const idx = npcs.indexOf(npc);
+                        if (idx > -1) npcs.splice(idx, 1);
+                        this.money += Math.floor(Math.random() * 100) + 50;
+                        this.kills++;
+                        this.wantedLevel = Math.min(5, this.wantedLevel + 2);
+                        this.messages.push('🔫 Убит NPC! +$' + (Math.floor(Math.random() * 100) + 50));
+                    }
+                    break;
+                }
+            }
+            
+            for (const cop of police) {
+                if (bullet.x < cop.x + cop.width && bullet.x + bullet.radius * 2 > cop.x &&
+                    bullet.y < cop.y + cop.height && bullet.y + bullet.radius * 2 > cop.y) {
+                    cop.health -= bullet.damage;
+                    bullet.alive = false;
+                    if (cop.health <= 0) {
+                        const idx = police.indexOf(cop);
+                        if (idx > -1) police.splice(idx, 1);
+                        this.money += Math.floor(Math.random() * 100) + 100;
+                        this.policeKills++;
+                        this.kills++;
+                        this.wantedLevel = Math.min(5, this.wantedLevel + 3);
+                        this.messages.push('🚔 УБИТ ПОЛИЦЕЙСКИЙ! +$' + (Math.floor(Math.random() * 100) + 100));
+                        if (police.length < 6) {
+                            police.push(new Police(
+                                Math.floor(Math.random() * (MAP_WIDTH - 200)) + 100,
+                                Math.floor(Math.random() * (MAP_HEIGHT - 300)) + 200
+                            ));
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        this.bullets = this.bullets.filter(b => b.alive);
+        
+        if (this.attacking) {
+            this.attackTimer--;
+            if (this.attackTimer <= 0) this.attacking = false;
+        }
+        if (this.attackCooldown > 0) this.attackCooldown--;
+        if (this.shootCooldown > 0) this.shootCooldown--;
+        
+        if (this.wantedLevel > 0) {
+            this.wantedTimer++;
+            if (this.wantedTimer > 300) {
+                this.wantedLevel--;
+                this.wantedTimer = 0;
+            }
+        }
+        
+        if (Math.abs(this.velX) > 0 && this.isGrounded) {
+            this.walkTimer++;
+            if (this.walkTimer > 10) {
+                this.walkTimer = 0;
+                this.walkFrame = (this.walkFrame + 1) % 4;
+            }
+        } else {
+            this.walkFrame = 0;
+        }
+        
+        this.x = Math.max(0, Math.min(this.x, MAP_WIDTH - this.width));
+        if (this.y > MAP_HEIGHT) this.health = 0;
+    }
+    
+    die() {
+        this.lives--;
+        if (this.lives <= 0) {
+            this.alive = false;
+            return;
+        }
+        this.health = this.maxHealth;
+        if (this.homeBuilding) {
+            this.x = this.homeBuilding.x + this.homeBuilding.width/2;
+            this.y = this.homeBuilding.y + 10;
+        } else {
+            this.x = WIDTH / 2;
+            this.y = 300;
+        }
+        this.money = Math.max(0, this.money - 200);
+        this.wantedLevel = Math.max(0, this.wantedLevel - 2);
+        this.invincibleTimer = 60;
+    }
+    
+    shoot(targetX, targetY) {
+        if (!this.hasGun || this.shootCooldown > 0 || !this.alive || this.weaponAmmo <= 0) {
+            if (this.hasGun && this.weaponAmmo <= 0) {
+                this.messages.push('❌ Нет патронов!');
+            }
+            return false;
+        }
+        
+        let damage = 25, speed = 12;
+        if (this.weaponType === 'shotgun') {
+            damage = 40;
+            speed = 8;
+            for (let i = 0; i < 5; i++) {
+                const b = new Bullet(
+                    this.x + this.width/2,
+                    this.y + this.height/2,
+                    targetX + (Math.random() - 0.5) * 40,
+                    targetY + (Math.random() - 0.5) * 40,
+                    'player'
+                );
+                b.damage = damage;
+                b.speed = speed;
+                this.bullets.push(b);
+            }
+            this.weaponAmmo--;
+            this.shootCooldown = 20;
+            return true;
+        } else if (this.weaponType === 'rifle') {
+            damage = 50;
+            speed = 15;
+        } else if (this.weaponType === 'uzi') {
+            damage = 15;
+            speed = 10;
+            this.shootCooldown = 3;
+        }
+        
+        const bullet = new Bullet(
+            this.x + this.width/2,
+            this.y + this.height/2,
+            targetX,
+            targetY,
+            'player'
+        );
+        bullet.damage = damage;
+        bullet.speed = speed;
+        this.bullets.push(bullet);
+        this.weaponAmmo--;
+        this.shootCooldown = this.weaponType === 'uzi' ? 3 : 10;
+        return true;
+    }
+    
+    attack(npcs, police, cars) {
+        if (this.attackCooldown > 0 || this.attacking || !this.alive) return;
+        
+        this.attacking = true;
+        this.attackTimer = 15;
+        this.attackCooldown = 20;
+        
+        const attackX = this.x + (this.width * this.direction) - 10;
+        const attackY = this.y - 10;
+        const attackW = 40;
+        const attackH = 60;
+        
+        for (const npc of npcs) {
+            if (attackX < npc.x + npc.width && attackX + attackW > npc.x &&
+                attackY < npc.y + npc.height && attackY + attackH > npc.y) {
+                npc.health -= 25;
+                npc.attacked = true;
+                npc.attackTimer = 30;
+                npc.x += this.direction * 20;
+                if (npc.health <= 0) {
+                    const idx = npcs.indexOf(npc);
+                    if (idx > -1) npcs.splice(idx, 1);
+                    this.money += Math.floor(Math.random() * 100) + 50;
+                    this.kills++;
+                    this.wantedLevel = Math.min(5, this.wantedLevel + 2);
+                    this.messages.push('Убит NPC! +$' + (Math.floor(Math.random() * 100) + 50));
+                } else {
+                    this.wantedLevel = Math.min(5, this.wantedLevel + 1);
+                }
+            }
+        }
+        
+        for (const cop of police) {
+            if (attackX < cop.x + cop.width && attackX + attackW > cop.x &&
+                attackY < cop.y + cop.height && attackY + attackH > cop.y) {
+                cop.health -= 30;
+                cop.x += this.direction * 25;
+                if (cop.health <= 0) {
+                    const idx = police.indexOf(cop);
+                    if (idx > -1) police.splice(idx, 1);
+                    this.money += Math.floor(Math.random() * 100) + 100;
+                    this.policeKills++;
+                    this.kills++;
+                    this.wantedLevel = Math.min(5, this.wantedLevel + 3);
+                    this.messages.push('🚔 УБИТ ПОЛИЦЕЙСКИЙ! +$' + (Math.floor(Math.random() * 100) + 100));
+                    if (police.length < 6) {
+                        police.push(new Police(
+                            Math.floor(Math.random() * (MAP_WIDTH - 200)) + 100,
+                            Math.floor(Math.random() * (MAP_HEIGHT - 300)) + 200
+                        ));
+                    }
+                } else {
+                    this.wantedLevel = Math.min(5, this.wantedLevel + 2);
+                }
+            }
+        }
+        
+        for (const car of cars) {
+            if (car && attackX < car.x + car.width && attackX + attackW > car.x &&
+                attackY < car.y + car.height && attackY + attackH > car.y &&
+                !car.stolen) {
+                if (this.money >= 100) {
+                    this.money -= 100;
+                    car.stolen = true;
+                    car.color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                    this.wantedLevel = Math.min(5, this.wantedLevel + 2);
+                    this.messages.push('🚗 Угнал машину! -$100');
+                }
+            }
+        }
+    }
+    
+    draw(ctx, camX, camY) {
+        if (!this.alive) return;
+        
+        const sx = this.x - camX;
+        const sy = this.y - camY;
+        if (sx < -50 || sx > WIDTH + 50 || sy < -50 || sy > HEIGHT + 50) return;
+        
+        if (this.invincibleTimer > 0 && Math.floor(this.invincibleTimer / 5) % 2 === 0) return;
+        
+        // Тень
+        ctx.fillStyle = 'rgba(50,50,50,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(sx + 15, sy + 50, 15, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Ноги
+        let legOffset = 0;
+        if (this.walkFrame === 1) legOffset = 3;
+        else if (this.walkFrame === 2) legOffset = -3;
+        
+        ctx.fillStyle = '#000096';
+        ctx.fillRect(sx + 5, sy + 35 + legOffset, 6, 15);
+        ctx.fillRect(sx + 19, sy + 35 - legOffset, 6, 15);
+        
+        // Тело
+        ctx.fillStyle = this.color;
+        ctx.fillRect(sx + 5, sy + 15, 20, 25);
+        
+        // Пояс
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(sx + 5, sy + 30, 20, 5);
+        
+        // Руки
+        ctx.fillStyle = '#FFC8A0';
+        if (this.hasGun && this.aiming) {
+            ctx.fillRect(sx + 25, sy + 15, 10, 5);
+            ctx.fillRect(sx + 30, sy + 10, 5, 15);
+            ctx.fillStyle = '#888';
+            ctx.fillRect(sx + 32, sy + 8, 12, 6);
+            ctx.fillStyle = '#444';
+            ctx.fillRect(sx + 44, sy + 9, 4, 4);
+        } else if (this.attacking) {
+            if (this.direction > 0) {
+                ctx.fillRect(sx + 25, sy + 15, 10, 5);
+                ctx.fillRect(sx + 30, sy + 10, 5, 15);
+            } else {
+                ctx.fillRect(sx - 5, sy + 15, 10, 5);
+                ctx.fillRect(sx - 5, sy + 10, 5, 15);
+            }
+        } else {
+            ctx.fillRect(sx + 25, sy + 15, 5, 15);
+            ctx.fillRect(sx, sy + 15, 5, 15);
+        }
+        
+        // Голова
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 10, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFC8A0';
+        ctx.fill();
+        
+        // Волосы
+        ctx.strokeStyle = this.direction > 0 ? '#321F0A' : '#0A1F32';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(sx + 15, sy + 6, 10, Math.PI, 0);
+        ctx.stroke();
+        
+        // Глаза
+        const eyeX = this.direction > 0 ? sx + 18 : sx + 12;
+        ctx.fillStyle = '#FFF';
+        ctx.beginPath();
+        ctx.arc(eyeX, sy + 8, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(eyeX + (2 * this.direction), sy + 8, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Имя
+        ctx.fillStyle = '#FFF';
+        ctx.font = '12px monospace';
+        ctx.fillText(this.name, sx, sy - 25);
+        
+        // Жизни
+        ctx.fillStyle = '#FF0000';
+        ctx.font = '12px monospace';
+        ctx.fillText('❤️x' + this.lives, sx, sy - 40);
+        
+        // Оружие
+        if (this.hasGun) {
+            ctx.fillStyle = '#FFD700';
+            ctx.font = '12px monospace';
+            ctx.fillText('🔫 ' + this.weaponType + ': ' + this.weaponAmmo, sx, sy - 55);
+        }
+    }
+}
 
-        // ========================================================================
-        // ФУНКЦИИ UI
-        // ========================================================================
+// ======================== ИНИЦИАЛИЗАЦИЯ ОБЪЕКТОВ ========================
+let player1 = new Player(200, 500, '#32C832', 'Герой');
+let player2 = new Player(500, 500, '#C83232', 'Боец');
+player2.hasGun = true;
+player2.weaponType = 'uzi';
+player2.weaponAmmo = 40;
 
-        function closePhone() {
+let currentPlayer = player1;
+let players = [player1, player2];
+
+// Здания
+let buildings = [];
+const buildingNames = ['Жилой Комплекс', 'Бизнес Центр', 'Торговый Центр', 'Офисное Здание', 'Апартаменты', 'Гостиница'];
+
+// Дома игроков
+const house1 = new Building(150, GROUND_LEVEL, 80, 100, '#B4B4DC', 'Дом Героя');
+house1.healthPack = true;
+house1.maxNpcs = 0;
+house1.weaponSpawn = true;
+house1.weaponType = 'pistol';
+buildings.push(house1);
+
+const house2 = new Building(350, GROUND_LEVEL, 80, 100, '#DCB4B4', 'Дом Бойца');
+house2.healthPack = true;
+house2.maxNpcs = 0;
+house2.weaponSpawn = true;
+house2.weaponType = 'shotgun';
+buildings.push(house2);
+
+player1.homeBuilding = house1;
+player2.homeBuilding = house2;
+
+// Остальные здания
+for (let i = 0; i < buildingNames.length; i++) {
+    const x = Math.floor(Math.random() * (MAP_WIDTH - 400)) + 500;
+    const width = Math.floor(Math.random() * 80) + 120;
+    const height = Math.floor(Math.random() * 60) + 120;
+    const colors = ['#B4B4DC', '#DCB4B4', '#B4DCB4', '#DCDCB4'];
+    const building = new Building(x, GROUND_LEVEL, width, height, colors[i % colors.length], buildingNames[i]);
+    building.maxNpcs = Math.floor(Math.random() * 4) + 4;
+    building.weaponSpawn = Math.random() > 0.5;
+    building.weaponType = building.weaponSpawn ? ['pistol', 'shotgun', 'rifle', 'uzi'][Math.floor(Math.random() * 4)] : null;
+    buildings.push(building);
+}
+
+// NPC
+let npcs = [];
+for (let i = 0; i < 25; i++) {
+    const x = Math.floor(Math.random() * (MAP_WIDTH - 200)) + 100;
+    const y = Math.floor(Math.random() * (MAP_HEIGHT - 400)) + 200;
+    const types = ['civilian', 'business', 'gangster', 'worker'];
+    npcs.push(new NPC(x, y, types[Math.floor(Math.random() * types.length)]));
+}
+
+// Платформы
+let platforms = [
+    new Platform(0, MAP_HEIGHT - 40, MAP_WIDTH, 40, '#323232')
+];
+
+for (let i = 0; i < 10; i++) {
+    const x = Math.floor(Math.random() * (MAP_WIDTH - 300)) + 200;
+    const y = Math.floor(Math.random() * (MAP_HEIGHT - 400)) + 200;
+    platforms.push(new Platform(x, y, Math.floor(Math.random() * 70) + 80, 20, '#649564'));
+}
+
+// Полиция
+let police = [
+    new Police(400, 400),
+    new Police(900, 400),
+    new Police(1500, 400),
+    new Police(2000, 400)
+];
+
+// Машины
+let cars = [];
+for (let i = 0; i < 10; i++) {
+    const x = Math.floor(Math.random() * (MAP_WIDTH - 200)) + 100;
+    const colors = ['#FFA500', '#FFC800', '#0096FF', '#C800C8'];
+    cars.push(new Car(x, MAP_HEIGHT - 70, colors[i % colors.length]));
+}
+
+const policeCar = new Car(50, MAP_HEIGHT - 70, '#000096');
+policeCar.isPolice = true;
+cars.push(policeCar);
+
+// ======================== ФУНКЦИИ ========================
+function closePhone() {
+    phoneOpen = false;
+    document.getElementById('phone').style.display = 'none';
+}
+
+function nextMessage() {
+    if (currentPlayer.messages.length > 0) {
+        currentPlayer.messageIndex = (currentPlayer.messageIndex + 1) % currentPlayer.messages.length;
+        document.getElementById('phoneMessage').textContent = currentPlayer.messages[currentPlayer.messageIndex];
+    }
+}
+
+function updateUI() {
+    const p = currentPlayer;
+    document.getElementById('healthDisplay').textContent = Math.floor(p.health);
+    document.getElementById('moneyDisplay').textContent = p.money;
+    document.getElementById('weaponDisplay').textContent = p.hasGun ? p.weaponType + ': ' + p.weaponAmmo : 'Нет';
+    document.getElementById('livesDisplay').textContent = p.lives;
+    document.getElementById('playerNameDisplay').textContent = p.name;
+    
+    const wantedEl = document.getElementById('wantedDisplay');
+    if (p.wantedLevel > 0) {
+        wantedEl.textContent = '⭐'.repeat(p.wantedLevel) + ' УРОВЕНЬ ' + p.wantedLevel;
+        wantedEl.style.color = p.wantedLevel >= 3 ? '#FF0000' : '#FFD700';
+    } else {
+        wantedEl.textContent = '✅ Чисто';
+        wantedEl.style.color = '#00FF00';
+    }
+    
+    const statusEl = document.getElementById('statusDisplay');
+    if (p.insideBuilding) {
+        statusEl.textContent = '🏢 ' + p.insideBuilding.name;
+        statusEl.style.color = '#00FFFF';
+    } else if (p.inCar) {
+        statusEl.textContent = '🚗 В машине';
+        statusEl.style.color = '#FFD700';
+    } else if (!p.alive) {
+        statusEl.textContent = '💀 МЕРТВ';
+        statusEl.style.color = '#FF0000';
+    } else {
+        statusEl.textContent = '';
+    }
+    
+    document.getElementById('wanted').style.display = p.wantedLevel >= 3 && p.alive ? 'block' : 'none';
+    
+    // Обновляем телефон
+    if (phoneOpen) {
+        const info = document.getElementById('phoneInfo');
+        info.innerHTML = `
+            <div class="info">👤 Игрок: ${p.name}</div>
+            <div class="info">❤️ Жизней: ${p.lives}</div>
+            <div class="info">❤️ Здоровье: ${Math.floor(p.health)}%</div>
+            <div class="info">💰 Деньги: $${p.money}</div>
+            <div class="info">💀 Убийств: ${p.kills}</div>
+            <div class="info">🚔 Полицейских: ${p.policeKills}</div>
+            <div class="info">⭐ Уровень: ${p.wantedLevel}</div>
+            <div class="info">🔫 Оружие: ${p.hasGun ? p.weaponType : 'Нет'}</div>
+            <div class="info">🔫 Патроны: ${p.weaponAmmo}</div>
+        `;
+        if (p.messages.length > 0) {
+            document.getElementById('phoneMessage').textContent = p.messages[p.messageIndex % p.messages.length];
+        }
+    }
+}
+
+// ======================== ИГРОВОЙ ЦИКЛ ========================
+function gameLoop() {
+    // Обновление
+    const allPlatforms = [...platforms];
+    
+    // Управление
+    if (currentPlayer.alive && !currentPlayer.insideBuilding) {
+        currentPlayer.velX = 0;
+        currentPlayer.aiming = mouse.rightButton;
+        
+        if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+            if (currentPlayer.inCar) {
+                currentPlayer.car.velX = -5;
+            } else {
+                currentPlayer.velX = -currentPlayer.speed;
+                currentPlayer.direction = -1;
+            }
+        }
+        if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+            if (currentPlayer.inCar) {
+                currentPlayer.car.velX = 5;
+            } else {
+                currentPlayer.velX = currentPlayer.speed;
+                currentPlayer.direction = 1;
+            }
+        }
+        if (keys['Shift']) {
+            if (!currentPlayer.inCar) {
+                currentPlayer.speed = currentPlayer.runSpeed;
+            }
+        } else {
+            currentPlayer.speed = 5;
+        }
+    }
+    
+    // Обновление объектов
+    currentPlayer.update(allPlatforms, npcs, cars, police, buildings);
+    
+    for (const npc of npcs) {
+        npc.update(allPlatforms, currentPlayer, buildings);
+    }
+    
+    for (const cop of police) {
+        cop.update(allPlatforms, currentPlayer);
+    }
+    
+    for (const car of cars) {
+        car.update();
+    }
+    
+    if (currentPlayer.health <= 0 && currentPlayer.alive) {
+        currentPlayer.die();
+    }
+    
+    // Камера
+    const targetCamX = currentPlayer.x - WIDTH / 2;
+    const targetCamY = currentPlayer.y - HEIGHT / 2;
+    camera.x += (targetCamX - camera.x) * 0.1;
+    camera.y += (targetCamY - camera.y) * 0.1;
+    camera.x = Math.max(0, Math.min(camera.x, MAP_WIDTH - WIDTH));
+    camera.y = Math.max(0, Math.min(camera.y, MAP_HEIGHT - HEIGHT));
+    
+    // Отрисовка
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    
+    // Трава
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(0, 0, WIDTH, HEIGHT - 40);
+    
+    // Разметка дороги
+    for (let i = 0; i < MAP_WIDTH; i += 60) {
+        const sx = i - camera.x;
+        if (sx > 0 && sx < WIDTH) {
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(sx, HEIGHT - 20, 30, 4);
+        }
+    }
+    
+    // Платформы
+    for (const plat of platforms) {
+        plat.draw(ctx, camera.x, camera.y);
+    }
+    
+    // Здания
+    for (const building of buildings) {
+        building.draw(ctx, camera.x, camera.y);
+    }
+    
+    // NPC
+    for (const npc of npcs) {
+        if (!npc.insideBuilding) {
+            npc.draw(ctx, camera.x, camera.y);
+        }
+    }
+    
+    // Полиция
+    for (const cop of police) {
+        cop.draw(ctx, camera.x, camera.y);
+    }
+    
+    // Машины
+    for (const car of cars) {
+        car.draw(ctx, camera.x, camera.y);
+    }
+    
+    // Игроки
+    for (const player of players) {
+        player.draw(ctx, camera.x, camera.y);
+    }
+    
+    // Пули
+    for (const bullet of currentPlayer.bullets) {
+        bullet.draw(ctx, camera.x, camera.y);
+    }
+    
+    // Прицел
+    if (currentPlayer.hasGun && currentPlayer.aiming && currentPlayer.alive) {
+        const mx = mouse.x;
+        const my = mouse.y;
+        let color = '#00FF00';
+        if (currentPlayer.weaponType === 'shotgun') color = '#FFA500';
+        else if (currentPlayer.weaponType === 'rifle') color = '#FF0000';
+        else if (currentPlayer.weaponType === 'uzi') color = '#FFD700';
+        
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(mx, my, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(mx, my, 5, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(mx - 20, my);
+        ctx.lineTo(mx - 10, my);
+        ctx.moveTo(mx + 20, my);
+        ctx.lineTo(mx + 10, my);
+        ctx.moveTo(mx, my - 20);
+        ctx.lineTo(mx, my - 10);
+        ctx.moveTo(mx, my + 20);
+        ctx.lineTo(mx, my + 10);
+        ctx.stroke();
+        
+        // Лазер
+        ctx.globalAlpha = 0.3;
+        ctx.strokeStyle = '#FF0000';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(currentPlayer.x + currentPlayer.width/2 - camera.x, currentPlayer.y + currentPlayer.height/2 - camera.y);
+        ctx.lineTo(mx, my);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+    }
+    
+    // UI
+    updateUI();
+    
+    requestAnimationFrame(gameLoop);
+}
+
+// ======================== ОБРАБОТЧИКИ СОБЫТИЙ ========================
+document.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+    
+    const p = currentPlayer;
+    
+    if (e.key === ' ' || e.key === 'Space') {
+        e.preventDefault();
+        if (p.isGrounded && !p.inCar) {
+            p.velY = JUMP_POWER;
+        }
+    }
+    
+    if (e.key === 'e' || e.key === 'E') {
+        if (p.alive) {
+            if (p.insideBuilding) {
+                p.exitBuilding();
+            } else {
+                p.enterBuilding(buildings);
+            }
+            if (!p.insideBuilding) {
+                if (p.inCar) {
+                    p.exitCar();
+                } else {
+                    p.enterCar(cars);
+                }
+            }
+        }
+    }
+    
+    if (e.key === 'h' || e.key === 'H') {
+        if (p.alive) p.useHealthPack();
+    }
+    
+    if (e.key === 'f' || e.key === 'F') {
+        if (p.alive) p.pickupWeaponFromBuilding(buildings);
+    }
+    
+    if (e.key === 'r' || e.key === 'R') {
+        if (p.alive) {
+            p.health = p.maxHealth;
+            p.money = 0;
+            p.wantedLevel = 0;
+            p.weaponAmmo = 30;
+        }
+    }
+    
+    if (e.key === 't' || e.key === 'T') {
+        phoneOpen = !phoneOpen;
+        document.getElementById('phone').style.display = phoneOpen ? 'block' : 'none';
+        if (phoneOpen) {
+            p.messages.push('📱 Жизней: ' + p.lives + ', Оружие: ' + p.weaponType);
+        }
+    }
+    
+    if (e.key === 'q' || e.key === 'Q') {
+        if (phoneOpen) {
+            nextMessage();
+        }
+    }
+    
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        if (currentPlayer === player1) {
+            currentPlayer = player2;
+        } else {
+            currentPlayer = player1;
+        }
+        currentPlayer.phoneActive = false;
+        if (phoneOpen) {
             phoneOpen = false;
-            document.getElementById('phoneOverlay').style.display = 'none';
+            document.getElementById('phone').style.display = 'none';
         }
+    }
+});
 
-        function nextMessage() {
-            if (currentPlayer.messages.length > 0) {
-                currentPlayer.msgIndex = (currentPlayer.msgIndex + 1) % currentPlayer.messages.length;
-                document.getElementById('phoneMessage').textContent = currentPlayer.messages[currentPlayer.msgIndex];
-            }
-        }
+document.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
 
-        function updateUI() {
-            const p = currentPlayer;
-            document.getElementById('healthDisplay').textContent = Math.floor(p.health);
-            document.getElementById('moneyDisplay').textContent = p.money;
-            document.getElementById('weaponDisplay').textContent = p.hasGun ? p.weaponType + ': ' + p.weaponAmmo : 'Нет';
-            document.getElementById('livesDisplay').textContent = p.lives;
-            document.getElementById('playerNameDisplay').textContent = p.name;
-            const wEl = document.getElementById('wantedDisplay');
-            if (p.wantedLevel > 0) {
-                wEl.textContent = '⭐'.repeat(p.wantedLevel) + ' УРОВЕНЬ ' + p.wantedLevel;
-                wEl.style.color = p.wantedLevel >= 3 ? '#FF0000' : '#FFD700';
-            } else { wEl.textContent = '✅ Чисто'; wEl.style.color = '#00FF00'; }
-            const sEl = document.getElementById('statusDisplay');
-            if (p.insideBuilding) { sEl.textContent = '🏢 ' + p.insideBuilding.name; sEl.style.color = '#00FFFF'; }
-            else if (p.inCar) { sEl.textContent = '🚗 В машине'; sEl.style.color = '#FFD700'; }
-            else if (!p.alive) { sEl.textContent = '💀 МЕРТВ'; sEl.style.color = '#FF0000'; }
-            else sEl.textContent = '';
-            document.getElementById('wantedAlert').style.display = p.wantedLevel >= 3 && p.alive ? 'block' : 'none';
-            if (phoneOpen) {
-                const info = document.getElementById('phoneInfo');
-                info.innerHTML = `
-                    <div class="info">👤 Игрок: ${p.name}</div>
-                    <div class="info">❤️ Жизней: ${p.lives}</div>
-                    <div class="info">❤️ Здоровье: ${Math.floor(p.health)}%</div>
-                    <div class="info">💰 Деньги: $${p.money}</div>
-                    <div class="info">💀 Убийств: ${p.kills}</div>
-                    <div class="info">🚔 Полицейских: ${p.policeKills}</div>
-                    <div class="info">⭐ Уровень: ${p.wantedLevel}</div>
-                    <div class="info">🔫 Оружие: ${p.hasGun ? p.weaponType : 'Нет'}</div>
-                    <div class="info">🔫 Патроны: ${p.weaponAmmo}</div>
-                `;
-                if (p.messages.length > 0) {
-                    document.getElementById('phoneMessage').textContent = p.messages[p.msgIndex % p.messages.length];
-                }
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+
+canvas.addEventListener('mousedown', (e) => {
+    if (e.button === 0) {
+        mouse.button = true;
+        if (currentPlayer.hasGun && currentPlayer.alive && !currentPlayer.insideBuilding) {
+            const targetX = mouse.x + camera.x;
+            const targetY = mouse.y + camera.y;
+            if (currentPlayer.shoot(targetX, targetY)) {
+                currentPlayer.messages.push('🔫 Выстрел из ' + currentPlayer.weaponType + '!');
             }
         }
+    }
+    if (e.button === 2) {
+        mouse.rightButton = true;
+    }
+});
 
-        // ========================================================================
-        // ИГРОВОЙ ЦИКЛ
-        // ========================================================================
+canvas.addEventListener('mouseup', (e) => {
+    if (e.button === 0) mouse.button = false;
+    if (e.button === 2) mouse.rightButton = false;
+});
 
-        function gameLoop() {
-            const allPlats = platforms;
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-            // Управление
-            if (currentPlayer.alive && !currentPlayer.insideBuilding) {
-                currentPlayer.velX = 0;
-                currentPlayer.aiming = mouse.right;
-                if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-                    if (currentPlayer.inCar) currentPlayer.car.velX = -5;
-                    else { currentPlayer.velX = -currentPlayer.speed; currentPlayer.dir = -1; }
-                }
-                if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-                    if (currentPlayer.inCar) currentPlayer.car.velX = 5;
-                    else { currentPlayer.velX = currentPlayer.speed; currentPlayer.dir = 1; }
-                }
-                if (keys['Shift']) { if (!currentPlayer.inCar) currentPlayer.speed = currentPlayer.runSpeed; }
-                else currentPlayer.speed = 5;
-            }
-
-            // Обновление объектов
-            currentPlayer.update(allPlats, npcs, cars, police, buildings);
-            for (const n of npcs) n.update(allPlats, currentPlayer, buildings);
-            for (const c of police) c.update(allPlats, currentPlayer);
-            for (const c of cars) c.update();
-            if (currentPlayer.health <= 0 && currentPlayer.alive) currentPlayer.die();
-
-            // Камера
-            const tcx = currentPlayer.x - W/2, tcy = currentPlayer.y - H/2;
-            camera.x += (tcx - camera.x) * 0.1;
-            camera.y += (tcy - camera.y) * 0.1;
-            camera.x = Math.max(0, Math.min(camera.x, MAP_W - W));
-            camera.y = Math.max(0, Math.min(camera.y, MAP_H - H));
-
-            // Отрисовка
-            ctx.clearRect(0, 0, W, H);
-            ctx.fillStyle = '#4CAF50';
-            ctx.fillRect(0, 0, W, H - 40);
-            for (let i = 0; i < MAP_W; i += 60) {
-                const sx = i - camera.x;
-                if (sx > 0 && sx < W) { ctx.fillStyle = '#FFD700'; ctx.fillRect(sx, H - 20, 30, 4); }
-            }
-            for (const p of platforms) p.draw(ctx, camera.x, camera.y);
-            for (const b of buildings) b.draw(ctx, camera.x, camera.y);
-            for (const n of npcs) if (!n.insideBuilding) n.draw(ctx, camera.x, camera.y);
-            for (const c of police) c.draw(ctx, camera.x, camera.y);
-            for (const c of cars) c.draw(ctx, camera.x, camera.y);
-            for (const p of players) p.draw(ctx, camera.x, camera.y);
-            for (const b of currentPlayer.bullets) b.draw(ctx, camera.x, camera.y);
-
-            // Прицел
-            if (currentPlayer.hasGun && currentPlayer.aiming && currentPlayer.alive) {
-                const mx = mouse.x, my = mouse.y;
-                let col = '#00FF00';
-                if (currentPlayer.weaponType === 'shotgun') col = '#FFA500';
-                else if (currentPlayer.weaponType === 'rifle') col = '#FF0000';
-                else if (currentPlayer.weaponType === 'uzi') col = '#FFD700';
-                ctx.strokeStyle = col;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(mx, my, 15, 0, Math.PI*2);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(mx, my, 5, 0, Math.PI*2);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(mx - 20, my); ctx.lineTo(mx - 10, my);
-                ctx.moveTo(mx + 20, my); ctx.lineTo(mx + 10, my);
-                ctx.moveTo(mx, my - 20); ctx.lineTo(mx, my - 10);
-                ctx.moveTo(mx, my + 20); ctx.lineTo(mx, my + 10);
-                ctx.stroke();
-                ctx.globalAlpha = 0.3;
-                ctx.strokeStyle = '#FF0000';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(currentPlayer.x + currentPlayer.w/2 - camera.x, currentPlayer.y + currentPlayer.h/2 - camera.y);
-                ctx.lineTo(mx, my);
-                ctx.stroke();
-                ctx.globalAlpha = 1;
-            }
-
-            updateUI();
-            requestAnimationFrame(gameLoop);
-        }
-
-        // ========================================================================
-        // ОБРАБОТЧИКИ СОБЫТИЙ
-        // ========================================================================
-
-        document.addEventListener('keydown', (e) => {
-            keys[e.key] = true;
-            const p = currentPlayer;
-            if (e.key === ' ' || e.key === 'Space') {
-                e.preventDefault();
-                if (p.grounded && !p.inCar) p.velY = JUMP_POWER;
-            }
-            if (e.key === 'e' || e.key === 'E') {
-                if (p.alive) {
-                    if (p.insideBuilding) p.exitBuilding();
-                    else p.enterBuilding(buildings);
-                    if (!p.insideBuilding) {
-                        if (p.inCar) p.exitCar();
-                        else p.enterCar(cars);
-                    }
-                }
-            }
-            if (e.key === 'h' || e.key === 'H') { if (p.alive) p.useHealthPack(); }
-            if (e.key === 'f' || e.key === 'F') { if (p.alive) p.pickupWeaponFromBuilding(buildings); }
-            if (e.key === 'r' || e.key === 'R') {
-                if (p.alive) { p.health = p.maxHealth; p.money = 0; p.wantedLevel = 0; p.weaponAmmo = 30; }
-            }
-            if (e.key === 't' || e.key === 'T') {
-                phoneOpen = !phoneOpen;
-                document.getElementById('phoneOverlay').style.display = phoneOpen ? 'block' : 'none';
-                if (phoneOpen) p.messages.push('📱 Жизней: ' + p.lives + ', Оружие: ' + p.weaponType);
-            }
-            if (e.key === 'q' || e.key === 'Q') { if (phoneOpen) nextMessage(); }
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                currentPlayer = currentPlayer === p1 ? p2 : p1;
-                currentPlayer.phoneActive = false;
-                if (phoneOpen) { phoneOpen = false; document.getElementById('phoneOverlay').style.display = 'none'; }
-            }
-        });
-
-        document.addEventListener('keyup', (e) => { keys[e.key] = false; });
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
-        });
-
-        canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
-                mouse.button = true;
-                if (currentPlayer.hasGun && currentPlayer.alive && !currentPlayer.insideBuilding) {
-                    const tx = mouse.x + camera.x, ty = mouse.y + camera.y;
-                    if (currentPlayer.shoot(tx, ty)) {
-                        currentPlayer.messages.push('🔫 Выстрел из ' + currentPlayer.weaponType + '!');
-                    }
-                }
-            }
-            if (e.button === 2) mouse.right = true;
-        });
-
-        canvas.addEventListener('mouseup', (e) => {
-            if (e.button === 0) mouse.button = false;
-            if (e.button === 2) mouse.right = false;
-        });
-
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-
-        // Добавляем методы для Player (чтобы не нарушить порядок)
-        Player.prototype.enterBuilding = function(buildings) {
-            if (this.insideBuilding) return;
-            for (const b of buildings) {
-                if (this.x + this.w/2 > b.x && this.x + this.w/2 < b.x + b.w &&
-                    this.y + this.h > b.y - b.h && this.y < b.y) {
-                    b.enter(this);
-                    this.insideBuilding = b;
-                    break;
-                }
-            }
-        };
-        Player.prototype.exitBuilding = function() {
-            if (this.insideBuilding) {
-                this.insideBuilding.exit(this);
-                this.insideBuilding = null;
-            }
-        };
-        Player.prototype.useHealthPack = function() {
-            if (this.insideBuilding && this.insideBuilding.healthPack) {
-                this.insideBuilding.healthPack = false;
-                this.health = Math.min(this.maxHealth, this.health + 40);
-                this.messages.push('💊 Использовал аптечку! Здоровье: ' + this.health);
-                return true;
-            }
-            return false;
-        };
-        Player.prototype.pickupWeaponFromBuilding = function(buildings) {
-            if (this.insideBuilding) return this.insideBuilding.pickupWeapon(this);
-            return false;
-        };
-        Player.prototype.enterCar = function(cars) {
-            if (this.inCar) return;
-            for (const c of cars) {
-                if (this.x < c.x + c.w && this.x + this.w > c.x &&
-                    this.y < c.y + c.h && this.y + this.h > c.y && !c.stolen) {
-                    this.inCar = true;
-                    this.car = c;
-                    c.occupied = true;
-                    this.messages.push('🚗 Сел в машину!');
-                    break;
-                }
-            }
-        };
-        Player.prototype.exitCar = function() {
-            if (this.inCar && this.car) {
-                this.inCar = false;
-                this.car.occupied = false;
-                this.x = this.car.x + this.car.w/2 - this.w/2;
-                this.y = this.car.y - this.h;
-                this.car = null;
-                this.messages.push('🚗 Вышел из машины!');
-            }
-        };
-        Building.prototype.enter = function(player) {
-            this.isInside = true;
-            player.insideBuilding = this;
-            player.x = this.x + this.w/2 - player.w/2;
-            player.y = this.y - this.h + 20;
-        };
-        Building.prototype.exit = function(player) {
-            this.isInside = false;
-            player.insideBuilding = null;
-            player.x = this.x + this.w/2 - player.w/2;
-            player.y = this.y + 10;
-        };
-        Building.prototype.pickupWeapon = function(player) {
-            if (this.weaponSpawn && this.weaponType && this.isInside) {
-                player.weaponType = this.weaponType;
-                player.hasGun = true;
-                const ammoMap = { pistol: 30, shotgun: 15, rifle: 20, uzi: 40 };
-                player.weaponAmmo = ammoMap[this.weaponType] || 30;
-                this.weaponSpawn = false;
-                player.messages.push('🔫 Взял ' + this.weaponType + '!');
-                return true;
-            }
-            return false;
-        };
-
-        // Запуск игры
-        gameLoop();
-    </script>
-
+// Запуск
+gameLoop();
+</script>
 </body>
 </html>
