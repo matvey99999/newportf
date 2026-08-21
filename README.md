@@ -84,8 +84,8 @@
 > Первый музыкальный эксперимент, созданный с помощью Suno AI.
 - [🔗 Слушать трек](https://suno.com/s/9O2ldKqHV223dlXz)
 
-### 🤖 Telegram Бот
-> Интерактивный бот, созданный для общения.
+### 🤖 Telegram Бот MINESR
+> Интерактивный Telegram-бот для общения и развлечений.
 - [🔗 Перейти в бота](https://t.me/matveyitmouse_bot)
 
 ---
@@ -118,7 +118,7 @@
 
 <div align="center">
   
-[![Telegram](https://img.shields.io/badge/Telegram-@matveyitmouse-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/matveyitmouse_bot)
+[![Telegram](https://img.shields.io/badge/Telegram-MINESR-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/matveyitmouse_bot)
 [![GitHub](https://img.shields.io/badge/GitHub-matveyitmouse-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/matveyitmouse)
 [![Email](https://img.shields.io/badge/Email-matvey@itmouse.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:matvey@itmouse.com)
 
