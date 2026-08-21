@@ -78,6 +78,7 @@
 > 2D-платформер с элементами GTA, встроенный в сайт-визитку.
 - **Стек:** JavaScript, Canvas, HTML/CSS
 - **Особенности:** Система боя, полиция, здания, машины
+- [🔗 **Играть в GTA Platformer**](https://matveyitmouse.github.io/portfolio/)
 
 ### 🎵 Трек «Стекло не бьется»
 > Первый музыкальный эксперимент, созданный с помощью Suno AI.
@@ -91,7 +92,13 @@
 
 ## 🎮 Игра GTA Platformer
 
-Управление:
+<div align="center">
+  
+[![Играть в GTA Platformer](https://img.shields.io/badge/▶️_ИГРАТЬ_В_GTA-000000?style=for-the-badge&logo=github&logoColor=white)](https://matveyitmouse.github.io/portfolio/)
+
+</div>
+
+**Управление:**
 
 | Клавиша | Действие |
 |---------|----------|
